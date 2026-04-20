@@ -6,12 +6,12 @@
     <title>My Trip Packing ✨</title>
     <style>
         :root {
-            --bg: #fff5f8;
-            --main: #ff758c;
-            --sub: #ff7eb3;
-            --accent: #ffccd5;
-            --text: #4a4a4a;
-            --done-bg: #fdf2f4;
+            --bg: #faf7f2;      /* 背景：温かみのあるサンドホワイト */
+            --main: #d1b799;    /* メイン：ご指定のラテベージュ */
+            --sub: #b5a18d;     /* サブ：濃いめのグレージュ */
+            --accent: #eaddcf;  /* アクセント：淡いベージュ */
+            --text: #5c544e;    /* 文字色：柔らかいダークブラウン */
+            --done-bg: #f2f0ed; /* 完了済み：落ち着いたグレーベージュ */
         }
 
         body {
@@ -23,78 +23,81 @@
 
         .container {
             max-width: 550px; margin: 0 auto; background: white;
-            border-radius: 35px; box-shadow: 0 10px 40px rgba(255, 117, 140, 0.2);
-            padding: 20px; border: 4px solid #fff;
+            border-radius: 30px; box-shadow: 0 10px 30px rgba(209, 183, 153, 0.15);
+            padding: 20px; border: 1px solid #efe8e0;
         }
 
-        h1 { text-align: center; color: var(--main); font-size: 1.4rem; margin: 10px 0 20px; }
+        h1 { text-align: center; color: var(--main); font-size: 1.3rem; margin: 10px 0 20px; letter-spacing: 1px; }
 
         /* 設定エリア */
         .config {
             display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-            background: #fffafa; padding: 18px; border-radius: 25px; border: 2px solid #ffe5ec;
+            background: #fdfcfb; padding: 18px; border-radius: 20px; border: 1px solid #f0ede9;
         }
         .full { grid-column: span 2; }
-        label { font-size: 0.75rem; font-weight: bold; color: var(--main); margin-bottom: 5px; display: block; }
+        label { font-size: 0.75rem; font-weight: bold; color: var(--sub); margin-bottom: 5px; display: block; }
         
         select, input {
-            width: 100%; padding: 12px; border-radius: 15px; border: 1px solid #fce4ec; 
-            margin-top: 4px; box-sizing: border-box; font-family: inherit; font-size: 0.9rem;
+            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eaddcf; 
+            margin-top: 4px; box-sizing: border-box; font-family: inherit; font-size: 0.9rem; color: var(--text);
+            background: #fff;
         }
 
         .btn-update {
-            grid-column: span 2; background: linear-gradient(135deg, var(--main), var(--sub));
-            color: white; border: none; padding: 14px; border-radius: 30px; 
-            font-weight: bold; cursor: pointer; margin-top: 5px;
+            grid-column: span 2; background: var(--main);
+            color: white; border: none; padding: 14px; border-radius: 25px; 
+            font-weight: bold; cursor: pointer; margin-top: 5px; transition: 0.3s;
         }
+        .btn-update:hover { opacity: 0.8; }
 
         .add-custom { margin: 20px 0; display: flex; gap: 10px; }
         .add-custom input { flex: 1; margin: 0; background: #fff; }
-        .btn-add { background: #ffb3c1; color: white; border: none; padding: 0 18px; border-radius: 15px; cursor: pointer; font-weight: bold; }
+        .btn-add { background: var(--accent); color: var(--text); border: none; padding: 0 18px; border-radius: 12px; cursor: pointer; font-weight: bold; }
 
-        .cat-title { font-size: 1rem; font-weight: bold; color: var(--main); margin: 25px 0 12px; border-left: 5px solid var(--main); padding-left: 10px; }
+        .cat-title { font-size: 0.95rem; font-weight: bold; color: var(--sub); margin: 25px 0 12px; border-left: 4px solid var(--main); padding-left: 10px; }
 
         /* アイテム行 */
         .item-row {
-            background: #fff; border: 1.5px solid #fff0f3; padding: 12px 15px;
-            border-radius: 20px; margin-bottom: 10px; transition: 0.3s;
+            background: #fff; border: 1px solid #f0ede9; padding: 12px 15px;
+            border-radius: 18px; margin-bottom: 10px; transition: 0.3s;
         }
 
         .item-main-flex { display: flex; align-items: center; }
-        .item-main { display: flex; align-items: center; cursor: pointer; flex: 1; font-size: 0.9rem; font-weight: bold; }
+        .item-main { display: flex; align-items: center; cursor: pointer; flex: 1; font-size: 0.88rem; font-weight: bold; }
         .check-box { 
-            width: 22px; height: 22px; border: 2px solid var(--accent); 
+            width: 20px; height: 20px; border: 2px solid var(--accent); 
             border-radius: 50%; margin-right: 12px; flex-shrink: 0; position: relative;
         }
         
         .checked .check-box { background: var(--main); border-color: var(--main); }
-        .checked .check-box::after { content: '✓'; color: white; position: absolute; left: 5px; top: -1px; font-weight: bold; }
-        .checked .parent-label { text-decoration: line-through; color: #d0d0d0; }
+        .checked .check-box::after { content: '✓'; color: white; position: absolute; left: 4px; top: -1px; font-weight: bold; font-size: 14px; }
+        .checked .parent-label { text-decoration: line-through; color: #b5b5b5; }
 
         .btn-delete {
-            background: none; border: none; color: #ffccd5; cursor: pointer; font-size: 1.1rem;
+            background: none; border: none; color: #dcd6d0; cursor: pointer; font-size: 1rem;
             padding: 5px; transition: 0.2s;
         }
+        .btn-delete:hover { color: #b5a18d; }
 
         /* 小項目（サブアイテム） */
         .sub-container {
-            margin: 10px 0 5px 34px; padding: 10px; background: #fffcfd; 
-            border-radius: 15px; border: 1px dashed #ffd1dc;
+            margin: 10px 0 5px 32px; padding: 10px; background: #faf9f7; 
+            border-radius: 12px; border: 1px dashed #eaddcf;
         }
-        .sub-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85rem; cursor: pointer; }
+        .sub-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.8rem; cursor: pointer; color: var(--text); }
         .sub-item:last-child { margin-bottom: 0; }
-        .sub-check { width: 18px; height: 18px; border: 1.5px solid #ddd; border-radius: 5px; margin-right: 10px; background: white; }
+        .sub-check { width: 16px; height: 16px; border: 1.5px solid #dcd6d0; border-radius: 4px; margin-right: 10px; background: white; }
         .sub-checked .sub-check { background: var(--sub); border-color: var(--sub); position: relative; }
-        .sub-checked .sub-check::after { content: '✓'; color: white; font-size: 12px; position: absolute; left: 3px; top: -1px; }
+        .sub-checked .sub-check::after { content: '✓'; color: white; font-size: 10px; position: absolute; left: 2px; top: -1px; }
 
-        #done-section { margin-top: 40px; border-top: 3px dotted #ffe5ec; padding-top: 10px; }
+        #done-section { margin-top: 40px; border-top: 2px dotted #eaddcf; padding-top: 10px; }
         .item-row.checked { background: var(--done-bg); border-color: transparent; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🎀My Packing List</h1>
+    <h1>🧺My Packing List</h1>
 
     <div class="config">
         <div>
@@ -137,17 +140,15 @@
     <div id="todo-list"></div>
     
     <div id="done-section">
-        <div class="cat-title">✅準備できた！</div>
+        <div class="cat-title">✅準備完了！</div>
         <div id="done-list"></div>
     </div>
 </div>
 
 <script>
-    // アイテムデータ構造
     const packingMaster = [
         {
             category: "💳貴重品・重要書類",
-            id: "valuables",
             items: [
                 { name: "基本セット👛", subs: ["財布・現金👛", "身分証🪪", "クレジットカード💳", "予備の財布👛"] },
                 { name: "ガジェット🔋", subs: ["スマホ📱", "充電器🔌", "モバイルバッテリー🔋", "変換プラグ🔌"] },
@@ -157,7 +158,6 @@
         },
         {
             category: "🧴美容・バス用品",
-            id: "beauty",
             items: [
                 { name: "スキンケア✨", subs: ["クレンジング🧼", "洗顔🫧", "導入液✨", "化粧水💧", "乳液🧴", "美容液✨", "クリーム🧴", "アイクリーム👀", "フェイスパック🎭"] },
                 { name: "バス・ボディケア🛁", subs: ["シャンプー🧴", "トリートメント🧴", "ヘアオイル✨", "ボディクリーム🧴", "入浴剤🛁", "洗顔ターバン🎀"] },
@@ -167,7 +167,6 @@
         },
         {
             category: "👗衣類・日用品",
-            id: "clothing",
             items: [
                 { name: "お洋服👕", hasQty: true, subs: ["着替え👕", "下着👙", "靴下・タイツ🧦"] },
                 { name: "おやすみ・ケア🛌", subs: ["パジャマ🛌", "着圧ソックス🧦", "室内スリッパ👟"] },
@@ -176,7 +175,6 @@
         },
         {
             category: "📍地域・季節特化",
-            id: "special",
             items: [
                 { name: "夏限定☀️", isSummer: true, subs: ["日傘⛱️", "日焼け止め🧴", "サングラス🕶️", "ファン🌀", "汗拭きシート🧊"] },
                 { name: "冬限定❄️", isWinter: true, subs: ["カイロ♨️", "マフラー🧣", "手袋🧤", "保湿バーム🍯"] },
@@ -187,9 +185,9 @@
         }
     ];
 
-    let customItems = JSON.parse(localStorage.getItem('my_custom_v9') || '[]');
-    let checkedItems = JSON.parse(localStorage.getItem('my_checked_v9') || '[]');
-    let deletedItems = JSON.parse(localStorage.getItem('my_deleted_v9') || '[]');
+    let customItems = JSON.parse(localStorage.getItem('my_custom_v10') || '[]');
+    let checkedItems = JSON.parse(localStorage.getItem('my_checked_v10') || '[]');
+    let deletedItems = JSON.parse(localStorage.getItem('my_deleted_v10') || '[]');
 
     function toggleCountry() {
         document.getElementById('country-div').style.display = (document.getElementById('area').value === 'overseas') ? 'block' : 'none';
@@ -213,7 +211,6 @@
             let catHasItem = false;
 
             cat.items.forEach(item => {
-                // 条件フィルタリング
                 if (item.isOverseas && area === 'domestic') return;
                 if (item.isSummer && season === 'winter') return;
                 if (item.isWinter && season === 'summer') return;
@@ -226,7 +223,6 @@
             });
         });
 
-        // じぶんリスト
         if (customItems.length > 0) {
             const customHeader = document.createElement('div');
             customHeader.className = 'cat-title';
@@ -244,7 +240,7 @@
         div.className = `item-row ${isChecked ? 'checked' : ''}`;
 
         let subHtml = "";
-        if (item.subs.length > 0) {
+        if (item.subs && item.subs.length > 0) {
             subHtml = `<div class="sub-container">`;
             item.subs.forEach(sub => {
                 const subKey = `sub_${item.name}_${sub}`;
@@ -257,7 +253,7 @@
             subHtml += `</div>`;
         }
 
-        const qtyText = item.hasQty ? `<small style="color:var(--main)"> [${nights+1}枚]</small>` : "";
+        const qtyText = item.hasQty ? `<small style="color:var(--sub);margin-left:5px;"> [${nights+1}枚]</small>` : "";
 
         div.innerHTML = `
             <div class="item-main-flex">
@@ -313,16 +309,16 @@
     function resetAll() {
         if (confirm("全てのチェックを解除しますか？")) {
             checkedItems = [];
-            localStorage.clear(); // サブ項目のチェックも消去
+            localStorage.clear();
             save();
             initList();
         }
     }
 
     function save() {
-        localStorage.setItem('my_custom_v9', JSON.stringify(customItems));
-        localStorage.setItem('my_checked_v9', JSON.stringify(checkedItems));
-        localStorage.setItem('my_deleted_v9', JSON.stringify(deletedItems));
+        localStorage.setItem('my_custom_v10', JSON.stringify(customItems));
+        localStorage.setItem('my_checked_v10', JSON.stringify(checkedItems));
+        localStorage.setItem('my_deleted_v10', JSON.stringify(deletedItems));
     }
 
     window.onload = () => {
