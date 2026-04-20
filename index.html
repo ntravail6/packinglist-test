@@ -27,7 +27,21 @@
             padding: 20px; border: 1px solid #efe8e0;
         }
 
-        h1 { text-align: center; color: var(--main); font-size: 1.3rem; margin: 10px 0 20px; letter-spacing: 1px; }
+        h1 { text-align: center; color: var(--main); font-size: 1.3rem; margin: 10px 0 15px; letter-spacing: 1px; }
+
+        /* 性別切り替えタブ */
+        .gender-switch {
+            display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
+        }
+        .gender-btn {
+            background: #fff; border: 2px solid var(--accent); color: var(--sub);
+            padding: 10px 25px; border-radius: 20px; cursor: pointer; font-weight: bold;
+            font-size: 0.9rem; transition: 0.3s;
+        }
+        .gender-btn.active {
+            background: var(--main); border-color: var(--main); color: white;
+            box-shadow: 0 4px 10px rgba(209, 183, 153, 0.3);
+        }
 
         /* 設定エリア */
         .config {
@@ -99,6 +113,11 @@
 <div class="container">
     <h1>🧺My Packing List</h1>
 
+    <div class="gender-switch">
+        <button id="btn-female" class="gender-btn active" onclick="setGender('female')">👩 女性向け</button>
+        <button id="btn-male" class="gender-btn" onclick="setGender('male')">👨 男性向け</button>
+    </div>
+
     <div class="config">
         <div>
             <label>🌏エリア</label>
@@ -146,51 +165,88 @@
 </div>
 
 <script>
+    // データの定義（gender属性を追加）
     const packingMaster = [
         {
-            category: "💳貴重品・重要書類",
+            category: "💳貴重品・重要書類（共通）",
             items: [
                 { name: "基本セット👛", subs: ["財布・現金👛", "身分証🪪", "クレジットカード💳", "予備の財布👛"] },
-                { name: "ガジェット🔋", subs: ["スマホ📱", "充電器🔌", "モバイルバッテリー🔋", "変換プラグ🔌"] },
-                { name: "重要書類控📄", isOverseas: true, subs: ["パスポート📕", "パスポートコピー📄", "航空券予約🎫", "海外旅行保険証🏥"] },
+                { name: "ガジェット🔋", subs: ["スマホ📱", "充電器🔌", "モバイルバッテリー🔋", "変換プラグ🔌", "電源タップ🔌⚡️"] },
+                { name: "重要書類控📄", isOverseas: true, subs: ["パスポート📕", "パスポートコピー📄", "航空券eチケット控え🎫", "ホテル予約確認書🏨"] },
+                { name: "海外便利グッズ✈️", isOverseas: true, subs: ["ノイズキャンセリングイヤホン🎧", "SIMピン📍", "液体物用ジッパー袋🛍️"] },
                 { name: "その他日用品🛍️", subs: ["エコバッグ🛍️", "メガネ・コンタクト👓", "筆記用具🖊️", "折りたたみ傘⛱️"] }
             ]
         },
         {
-            category: "🧴美容・バス用品",
+            category: "🧴美容・バス用品（女性向け）",
+            gender: "female",
             items: [
-                { name: "スキンケア✨", subs: ["クレンジング🧼", "洗顔🫧", "導入液✨", "化粧水💧", "乳液🧴", "美容液✨", "クリーム🧴", "アイクリーム👀", "フェイスパック🎭"] },
-                { name: "バス・ボディケア🛁", subs: ["シャンプー🧴", "トリートメント🧴", "ヘアオイル✨", "ボディクリーム🧴", "入浴剤🛁", "洗顔ターバン🎀"] },
-                { name: "メイク💄", subs: ["下地💄", "ファンデ🎨", "パウダー✨", "アイブロウ✏️", "アイシャドウ🎨", "アイライナー👁️", "マスカラ👁️", "ビューラー👀", "チーク😊", "リップ💄"] },
-                { name: "ヘア・鏡💇‍♀️", subs: ["ヘアアイロン💇‍♀️", "ヘアブラシ🪮", "ヘアゴム・ピン🎀", "卓上ミラー🪞"] }
+                { name: "スキンケア✨", subs: ["クレンジング🧼", "洗顔🫧", "導入液✨", "化粧水💧", "乳液🧴", "美容液✨", "クリーム🧴", "フェイシャルパック🎭"] },
+                { name: "メイク💄", subs: ["下地💄", "ファンデ🎨", "パウダー✨", "アイブロウ✏️", "アイシャドウ🎨", "マスカラ👁️", "チーク😊", "リップ💄"] },
+                { name: "ヘア・ボディケア🛁", subs: ["シャンプー類🧴", "ヘアオイル✨", "ボディクリーム🧴", "ヘアアイロン💇‍♀️", "ヘアブラシ🪮", "卓上ミラー🪞"] }
             ]
         },
         {
-            category: "👗衣類・日用品",
+            category: "👨身だしなみ・エチケット（男性向け）",
+            gender: "male",
             items: [
-                { name: "お洋服👕", hasQty: true, subs: ["着替え👕", "下着👙", "靴下・タイツ🧦"] },
+                { name: "フェイシャルケア🫧", subs: ["洗顔料（スクラブ/炭など）🫧", "オールインワンジェル🧴", "リップクリーム（無香料）🪞"] },
+                { name: "シェービング🪒", subs: ["髭剃り（使い慣れたもの）🪒", "シェービングジェル🫧", "アフターシェーブローション🧴"] },
+                { name: "ヘアケア・その他✂️", subs: ["ヘアワックス/ポマード💇‍♂️", "携帯用ヘアスプレー💨", "鼻毛カッター✂️", "爪切り💅"] },
+                { name: "ニオイ・日焼け対策☀️", subs: ["日焼け止め（ジェルタイプ）🧴", "ボディシート（汗対策）🧊", "携帯用香水/アトマイザー🌬️"] }
+            ]
+        },
+        {
+            category: "👗衣類・日用品（共通/女性寄り）",
+            items: [
+                { name: "お洋服👕", hasQty: true, gender: "female", subs: ["着替え👕", "下着👙", "靴下・タイツ🧦"] }, // 女性向け数量あり
+                { name: "お洋服👕", hasQty: true, gender: "male", subs: ["シャツ・Tシャツ👕", "予備の白Tシャツ👕", "ズボン・スラックス👖", "下着（ボクサー等）🩳", "靴下🧦", "ベルト👔"] }, // 男性向け数量あり
                 { name: "おやすみ・ケア🛌", subs: ["パジャマ🛌", "着圧ソックス🧦", "室内スリッパ👟"] },
-                { name: "衛生用品🩹", subs: ["ハンカチ🧼", "ウェットティッシュ🫧", "常備薬💊", "生理ナプキン🎀", "絆創膏🩹", "除菌ジェル🫧"] }
+                { name: "衛生用品🩹", subs: ["ハンカチ🧼", "ウェットティッシュ🫧", "絆創膏🩹", "除菌ジェル🫧", "生理用品🎀", "流せるティッシュ🧻"] },
+                { name: "お洗濯グッズ🧼", gender: "male", subs: ["ランドリーバッグ🛍️"] } // 男性向けに追加
+            ]
+        },
+        {
+            category: "🩹薬品類・海外特化（共通）",
+            items: [
+                { name: "常備薬💊", subs: ["鎮痛剤💊", "胃腸薬💊", "下痢止め💊", "正露丸🫙"] },
+                { name: "海外お役立ち✈️", isOverseas: true, subs: ["歯ブラシセット🪥", "携帯用スリッパ👟", "強力虫除け🦟"] }
             ]
         },
         {
             category: "📍地域・季節特化",
             items: [
-                { name: "夏限定☀️", isSummer: true, subs: ["日傘⛱️", "日焼け止め🧴", "サングラス🕶️", "ファン🌀", "汗拭きシート🧊"] },
-                { name: "冬限定❄️", isWinter: true, subs: ["カイロ♨️", "マフラー🧣", "手袋🧤", "保湿バーム🍯"] },
+                { name: "夏限定☀️", isSummer: true, subs: ["日傘⛱️", "日焼け止め🧴", "サングラス🕶️", "汗拭きシート🧊"] },
+                { name: "夏限定（男性向け）☀️", isSummer: true, gender: "male", subs: ["速乾Tシャツ👕", "短パン🩳", "帽子（キャップ）🧢", "スポーツサンダル🩴", "クールスプレー❄️"] },
+                { name: "冬限定❄️", isWinter: true, subs: ["使い捨てカイロ♨️", "マフラー🧣", "手袋（スマホ対応）🧤", "保湿バーム🍯", "ハンドクリーム🧴"] },
+                { name: "冬限定（男性向け）❄️", isWinter: true, gender: "male", subs: ["ヒートテック（上下）👕", "厚手セーター🧶", "インナーダウン🧥", "厚手の靴下🧦"] },
+                { name: "チップ・マナー国💵", target: ["usa", "europe"], subs: ["チップ用小額紙幣💵", "防犯バッグ🔒"] },
+                { name: "ドレスコード国👔", target: ["usa", "europe"], gender: "male", subs: ["襟付きシャツ👔", "革靴/クリーンな靴👟"] }, // 男性向け
                 { name: "韓国お役立ち🇰🇷", target: "korea", subs: ["WOWPASS💳", "美活用保冷バッグ❄️"] },
-                { name: "タイ/東南アジア🐘", target: "thai", subs: ["強力虫除け🦟", "かゆみ止め🩹", "割り箸🥢"] },
-                { name: "アメリカ/欧州💶", target: ["usa", "europe"], subs: ["チップ用小銭💵", "防犯バッグ🔒", "歩きやすい靴👟"] }
+                { name: "衛生注意国🌏", target: "thai", subs: ["携帯用ウォシュレット🚿🥢"] }
             ]
         }
     ];
 
-    let customItems = JSON.parse(localStorage.getItem('my_custom_v10') || '[]');
-    let checkedItems = JSON.parse(localStorage.getItem('my_checked_v10') || '[]');
-    let deletedItems = JSON.parse(localStorage.getItem('my_deleted_v10') || '[]');
+    // ローカルストレージのキーをv11に更新（男女切り替え対応のためリセット）
+    let currentGender = localStorage.getItem('my_gender_v11') || 'female';
+    let customItems = JSON.parse(localStorage.getItem('my_custom_v11') || '[]');
+    let checkedItems = JSON.parse(localStorage.getItem('my_checked_v11') || '[]');
+    let deletedItems = JSON.parse(localStorage.getItem('my_deleted_v11') || '[]');
 
     function toggleCountry() {
         document.getElementById('country-div').style.display = (document.getElementById('area').value === 'overseas') ? 'block' : 'none';
+    }
+
+    function setGender(gender) {
+        currentGender = gender;
+        localStorage.setItem('my_gender_v11', gender);
+        
+        // ボタンの見た目を更新
+        document.getElementById('btn-female').classList.toggle('active', gender === 'female');
+        document.getElementById('btn-male').classList.toggle('active', gender === 'male');
+        
+        initList(); // リストを再描画
     }
 
     function initList() {
@@ -205,12 +261,17 @@
         const nights = parseInt(document.getElementById('nights').value);
 
         packingMaster.forEach(cat => {
+            // カテゴリー全体の性別フィルタ
+            if (cat.gender && cat.gender !== currentGender) return;
+
             const catHeader = document.createElement('div');
             catHeader.className = 'cat-title';
             catHeader.innerText = cat.category;
             let catHasItem = false;
 
             cat.items.forEach(item => {
+                // 条件フィルタリング
+                if (item.gender && item.gender !== currentGender) return; // アイテム個別の性別フィルタ
                 if (item.isOverseas && area === 'domestic') return;
                 if (item.isSummer && season === 'winter') return;
                 if (item.isWinter && season === 'summer') return;
@@ -223,6 +284,7 @@
             });
         });
 
+        // じぶんリスト
         if (customItems.length > 0) {
             const customHeader = document.createElement('div');
             customHeader.className = 'cat-title';
@@ -243,7 +305,7 @@
         if (item.subs && item.subs.length > 0) {
             subHtml = `<div class="sub-container">`;
             item.subs.forEach(sub => {
-                const subKey = `sub_${item.name}_${sub}`;
+                const subKey = `sub_${currentGender}_${item.name}_${sub}`; // 性別をキーに含める
                 const isSubChecked = localStorage.getItem(subKey) === 'true';
                 subHtml += `
                     <div class="sub-item ${isSubChecked ? 'sub-checked' : ''}" onclick="event.stopPropagation(); toggleSub(this, '${subKey}')">
@@ -274,6 +336,7 @@
     }
 
     function toggleParent(name) {
+        // 同じ名前のアイテムが男女である場合、現在表示されている方だけを操作
         if (checkedItems.includes(name)) {
             checkedItems = checkedItems.filter(i => i !== name);
         } else {
@@ -310,20 +373,22 @@
         if (confirm("全てのチェックを解除しますか？")) {
             checkedItems = [];
             localStorage.clear();
+            localStorage.setItem('my_gender_v11', currentGender); // 性別設定だけ戻す
             save();
             initList();
         }
     }
 
     function save() {
-        localStorage.setItem('my_custom_v10', JSON.stringify(customItems));
-        localStorage.setItem('my_checked_v10', JSON.stringify(checkedItems));
-        localStorage.setItem('my_deleted_v10', JSON.stringify(deletedItems));
+        localStorage.setItem('my_custom_v11', JSON.stringify(customItems));
+        localStorage.setItem('my_checked_v11', JSON.stringify(checkedItems));
+        localStorage.setItem('my_deleted_v11', JSON.stringify(deletedItems));
     }
 
+    // 初期化
     window.onload = () => {
+        setGender(currentGender); // 保存されている性別を適用
         toggleCountry();
-        initList();
     };
 </script>
 </body>
