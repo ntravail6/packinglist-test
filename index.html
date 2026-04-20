@@ -6,112 +6,103 @@
     <title>My Trip Packing ✨</title>
     <style>
         :root {
-            --bg: #faf7f2;      /* 背景：温かみのあるサンドホワイト */
-            --main: #d1b799;    /* メイン：ご指定のラテベージュ */
-            --sub: #b5a18d;     /* サブ：濃いめのグレージュ */
-            --accent: #eaddcf;  /* アクセント：淡いベージュ */
-            --text: #5c544e;    /* 文字色：柔らかいダークブラウン */
-            --done-bg: #f2f0ed; /* 完了済み：落ち着いたグレーベージュ */
+            /* 女性向け（ラテベージュ） */
+            --bg-female: #faf7f2;
+            --main-female: #d1b799;
+            --sub-female: #b5a18d;
+            --accent-female: #eaddcf;
+            --text-female: #5c544e;
+            --done-female: #f2f0ed;
+
+            /* 男性向け（ブルーグレー） */
+            --bg-male: #f0f2f5;
+            --main-male: #6789a4;
+            --sub-male: #4a6375;
+            --accent-male: #cbd5e0;
+            --text-male: #2d3748;
+            --done-male: #e2e8f0;
+        }
+
+        body.mode-female {
+            --bg: var(--bg-female); --main: var(--main-female); --sub: var(--sub-female);
+            --accent: var(--accent-female); --text: var(--text-female); --done-bg: var(--done-female);
+        }
+        body.mode-male {
+            --bg: var(--bg-male); --main: var(--main-male); --sub: var(--sub-male);
+            --accent: var(--accent-male); --text: var(--text-male); --done-bg: var(--done-male);
         }
 
         body {
             font-family: 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 15px; margin: 0; line-height: 1.4;
+            background-color: var(--bg); color: var(--text);
+            padding: 15px; margin: 0; line-height: 1.4; transition: 0.3s;
         }
 
         .container {
             max-width: 550px; margin: 0 auto; background: white;
-            border-radius: 30px; box-shadow: 0 10px 30px rgba(209, 183, 153, 0.15);
-            padding: 20px; border: 1px solid #efe8e0;
+            border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 20px; border: 1px solid rgba(0,0,0,0.02);
         }
 
         h1 { text-align: center; color: var(--main); font-size: 1.3rem; margin: 10px 0 15px; letter-spacing: 1px; }
 
-        /* 性別切り替えタブ */
-        .gender-switch {
-            display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
-        }
+        .gender-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
         .gender-btn {
-            background: #fff; border: 2px solid var(--accent); color: var(--sub);
-            padding: 10px 25px; border-radius: 20px; cursor: pointer; font-weight: bold;
-            font-size: 0.9rem; transition: 0.3s;
+            flex: 1; background: #fff; border: 2px solid var(--accent); color: var(--sub);
+            padding: 12px; border-radius: 15px; cursor: pointer; font-weight: bold; transition: 0.3s;
+            font-size: 0.9rem; outline: none;
         }
-        .gender-btn.active {
-            background: var(--main); border-color: var(--main); color: white;
-            box-shadow: 0 4px 10px rgba(209, 183, 153, 0.3);
-        }
+        .gender-btn.active { background: var(--main); border-color: var(--main); color: white; }
 
-        /* 設定エリア */
         .config {
             display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
             background: #fdfcfb; padding: 18px; border-radius: 20px; border: 1px solid #f0ede9;
         }
         .full { grid-column: span 2; }
-        label { font-size: 0.75rem; font-weight: bold; color: var(--sub); margin-bottom: 5px; display: block; }
-        
+        label { font-size: 0.75rem; font-weight: bold; color: var(--sub); margin-bottom: 4px; display: block; }
         select, input {
-            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eaddcf; 
-            margin-top: 4px; box-sizing: border-box; font-family: inherit; font-size: 0.9rem; color: var(--text);
-            background: #fff;
+            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--accent); 
+            box-sizing: border-box; font-family: inherit; font-size: 0.9rem;
+            background: white; color: var(--text);
         }
 
-        .btn-update {
-            grid-column: span 2; background: var(--main);
-            color: white; border: none; padding: 14px; border-radius: 25px; 
-            font-weight: bold; cursor: pointer; margin-top: 5px; transition: 0.3s;
+        .btn-reset {
+            grid-column: span 2; background: none; color: var(--sub); border: 1px solid var(--accent); 
+            padding: 10px; border-radius: 15px; font-size: 0.8rem; cursor: pointer; margin-top: 5px;
         }
-        .btn-update:hover { opacity: 0.8; }
-
-        .add-custom { margin: 20px 0; display: flex; gap: 10px; }
-        .add-custom input { flex: 1; margin: 0; background: #fff; }
-        .btn-add { background: var(--accent); color: var(--text); border: none; padding: 0 18px; border-radius: 12px; cursor: pointer; font-weight: bold; }
 
         .cat-title { font-size: 0.95rem; font-weight: bold; color: var(--sub); margin: 25px 0 12px; border-left: 4px solid var(--main); padding-left: 10px; }
 
-        /* アイテム行 */
-        .item-row {
-            background: #fff; border: 1px solid #f0ede9; padding: 12px 15px;
-            border-radius: 18px; margin-bottom: 10px; transition: 0.3s;
-        }
+        .item-row { background: #fff; border: 1px solid #f0ede9; padding: 12px 15px; border-radius: 18px; margin-bottom: 10px; transition: 0.2s; }
+        .item-row.checked { background: var(--done-bg); border-color: transparent; opacity: 0.8; }
 
-        .item-main-flex { display: flex; align-items: center; }
-        .item-main { display: flex; align-items: center; cursor: pointer; flex: 1; font-size: 0.88rem; font-weight: bold; }
-        .check-box { 
-            width: 20px; height: 20px; border: 2px solid var(--accent); 
-            border-radius: 50%; margin-right: 12px; flex-shrink: 0; position: relative;
-        }
+        .item-main-flex { display: flex; align-items: center; justify-content: space-between; }
+        .item-main { display: flex; align-items: center; cursor: pointer; flex: 1; font-weight: bold; font-size: 0.9rem; }
         
+        .check-box { width: 20px; height: 20px; border: 2px solid var(--accent); border-radius: 50%; margin-right: 12px; position: relative; flex-shrink: 0; background: white; }
         .checked .check-box { background: var(--main); border-color: var(--main); }
-        .checked .check-box::after { content: '✓'; color: white; position: absolute; left: 4px; top: -1px; font-weight: bold; font-size: 14px; }
-        .checked .parent-label { text-decoration: line-through; color: #b5b5b5; }
+        .checked .check-box::after { content: '✓'; color: white; position: absolute; left: 4px; top: -1px; font-weight: bold; }
+        .checked .item-label { text-decoration: line-through; color: #b5b5b5; }
 
-        .btn-delete {
-            background: none; border: none; color: #dcd6d0; cursor: pointer; font-size: 1rem;
-            padding: 5px; transition: 0.2s;
-        }
-        .btn-delete:hover { color: #b5a18d; }
-
-        /* 小項目（サブアイテム） */
-        .sub-container {
-            margin: 10px 0 5px 32px; padding: 10px; background: #faf9f7; 
-            border-radius: 12px; border: 1px dashed #eaddcf;
-        }
-        .sub-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.8rem; cursor: pointer; color: var(--text); }
+        .sub-container { margin: 10px 0 0 32px; padding: 8px; background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px dashed var(--accent); }
+        .sub-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; }
         .sub-item:last-child { margin-bottom: 0; }
-        .sub-check { width: 16px; height: 16px; border: 1.5px solid #dcd6d0; border-radius: 4px; margin-right: 10px; background: white; }
-        .sub-checked .sub-check { background: var(--sub); border-color: var(--sub); position: relative; }
+        .sub-content { display: flex; align-items: flex-start; cursor: pointer; flex: 1; }
+        .sub-check { width: 16px; height: 16px; border: 1.5px solid var(--accent); border-radius: 4px; margin-right: 8px; background: white; position: relative; flex-shrink: 0; margin-top: 2px; }
+        .sub-checked .sub-check { background: var(--sub); border-color: var(--sub); }
         .sub-checked .sub-check::after { content: '✓'; color: white; font-size: 10px; position: absolute; left: 2px; top: -1px; }
+        .sub-checked span { text-decoration: line-through; color: #b5b5b5; }
 
-        #done-section { margin-top: 40px; border-top: 2px dotted #eaddcf; padding-top: 10px; }
-        .item-row.checked { background: var(--done-bg); border-color: transparent; }
+        .memo { display: block; font-size: 0.7rem; color: #999; margin-top: 2px; line-height: 1.2; font-weight: normal; }
+
+        .btn-del-sub { background: none; border: none; color: #dcd6d0; cursor: pointer; font-size: 0.9rem; padding: 5px; transition: 0.2s; }
+        .btn-del-sub:hover { color: #e57373; }
     </style>
 </head>
-<body>
+<body id="body" class="mode-female">
 
 <div class="container">
-    <h1>🧺My Packing List</h1>
+    <h1>🧺 My Packing List</h1>
 
     <div class="gender-switch">
         <button id="btn-female" class="gender-btn active" onclick="setGender('female')">👩 女性向け</button>
@@ -120,223 +111,194 @@
 
     <div class="config">
         <div>
-            <label>🌏エリア</label>
-            <select id="area" onchange="toggleCountry(); initList();">
+            <label>🌏 エリア</label>
+            <select id="area" onchange="toggleOverseas(); initList();">
                 <option value="domestic">国内旅行🇯🇵</option>
                 <option value="overseas">海外旅行✈️</option>
             </select>
         </div>
-        <div id="country-div" style="display:none;">
-            <label>📍行き先</label>
-            <select id="country" onchange="initList()">
-                <option value="general">🌍その他一般</option>
-                <option value="usa">🇺🇸アメリカ/チップ圏</option>
-                <option value="korea">🇰🇷韓国</option>
-                <option value="taiwan">🇹🇼台湾</option>
-                <option value="thai">🐘タイ/東南アジア</option>
-                <option value="europe">🏰ヨーロッパ</option>
+        <div>
+            <label>🌙 宿泊数</label>
+            <input type="number" id="nights" value="1" min="0" onchange="initList()">
+        </div>
+        <div id="style-div" class="full" style="display:none;">
+            <label>📍 旅行スタイル・渡航先</label>
+            <select id="tripStyle" onchange="initList()">
+                <option value="city">🏙️ 都市観光(🇰🇷/🇹🇼/🇭🇰/🇸🇬/🇺🇸等)</option>
+                <option value="beach">🏖️ リゾート(🇹🇭/🇻🇳/🇵🇭/🇮🇩/🇺🇸等)</option>
+                <option value="euro">🏛️ ヨーロッパ(🇫🇷/🇮🇹/🇪🇸/🇬🇧/🇵🇹等)</option>
+                <option value="nature">🐨 大自然(🇦🇺等)</option>
             </select>
         </div>
-        <div class="full">
-            <label>🌡️季節</label>
-            <select id="season" onchange="initList()">
-                <option value="summer">☀️夏（暑い時期）</option>
-                <option value="winter">❄️冬（寒い時期）</option>
-            </select>
-        </div>
-        <div class="full">
-            <label>🌙宿泊数</label>
-            <input type="number" id="nights" value="1" onchange="initList()">
-        </div>
-        <button class="btn-update" onclick="resetAll()">全チェック解除🔄</button>
-    </div>
-
-    <div class="add-custom">
-        <input type="text" id="custom-input" placeholder="自分だけの持ち物を追加...">
-        <button class="btn-add" onclick="addCustomItem()">追加</button>
+        <button class="btn-reset" onclick="resetAll()">リストをリセット🔄</button>
     </div>
 
     <div id="todo-list"></div>
-    
-    <div id="done-section">
-        <div class="cat-title">✅準備完了！</div>
-        <div id="done-list"></div>
-    </div>
 </div>
 
 <script>
-    // データの定義（gender属性を追加）
     const packingMaster = [
         {
-            category: "💳貴重品・重要書類（共通）",
+            category: "✨ スタイル特化アイテム",
+            isOverseas: true,
             items: [
-                { name: "基本セット👛", subs: ["財布・現金👛", "身分証🪪", "クレジットカード💳", "予備の財布👛"] },
-                { name: "ガジェット🔋", subs: ["スマホ📱", "充電器🔌", "モバイルバッテリー🔋", "変換プラグ🔌", "電源タップ🔌⚡️"] },
-                { name: "重要書類控📄", isOverseas: true, subs: ["パスポート📕", "パスポートコピー📄", "航空券eチケット控え🎫", "ホテル予約確認書🏨"] },
-                { name: "海外便利グッズ✈️", isOverseas: true, subs: ["ノイズキャンセリングイヤホン🎧", "SIMピン📍", "液体物用ジッパー袋🛍️"] },
-                { name: "その他日用品🛍️", subs: ["エコバッグ🛍️", "メガネ・コンタクト👓", "筆記用具🖊️", "折りたたみ傘⛱️"] }
+                { 
+                    name: "都市観光・ショッピング🏙️", style: "city", 
+                    subs: [
+                        { t: "大型サブバッグ", m: "💡帰りのお土産用" },
+                        { t: "歩きやすいスニーカー", m: "💡1日2万歩歩くため" },
+                        { t: "モバイルバッテリー2個", m: "💡マップと検索を多用するため" },
+                        { t: "着圧ソックス", m: "💡足のむくみ対策" },
+                        { t: "マスク", m: "💡交通機関や乾燥対策" },
+                        { t: "現地決済アプリ設定", m: "💡スムーズな買い物のため" },
+                        { t: "クレンジングサンプル", m: "💡現地で新しいコスメを試すため" }
+                    ] 
+                },
+                { 
+                    name: "ビーチリゾート・南国🏖️", style: "beach", 
+                    subs: [
+                        { t: "水着セット👙", m: "💡水着・ラッシュガード・ヌーブラ等" },
+                        { t: "ビーチサンダル", m: "💡砂浜歩き・ホテル内移動用" },
+                        { t: "防水スマホケース", m: "💡海中撮影・水濡れ防止" },
+                        { t: "飲む日焼け止め", m: "💡内側からのUVケア" },
+                        { t: "髪のUVカットスプレー", m: "💡海水のダメージ防止" },
+                        { t: "虫除け/痒み止め", m: "💡デング熱等対策" },
+                        { t: "強力冷房対策ストール", m: "💡建物内が非常に寒いため" },
+                        { t: "流せるウェットティッシュ", m: "💡衛生面対策" },
+                        { t: "捨ててもいい古タオル", m: "💡砂がついたものを拭く用" }
+                    ] 
+                },
+                { 
+                    name: "ヨーロッパ・歴史遺産巡り🏛️", style: "euro", 
+                    subs: [
+                        { t: "厚底スニーカー", m: "💡石畳での足裏の痛み防止" },
+                        { t: "肩と膝を隠す服", m: "💡教会等への入場マナー" },
+                        { t: "セキュリティポーチ", m: "💡服の下に隠せる貴重品入れ" },
+                        { t: "カバン用小型南京錠", m: "💡スリ防止対策" },
+                        { t: "チップ用の小銭入れ", m: "💡支払いをスムーズに" },
+                        { t: "硬水対策ヘアオイル", m: "💡髪のバサバサ防止" },
+                        { t: "レストラン用の服", m: "💡少し綺麗なワンピやシャツ" },
+                        { t: "マルチ変換プラグ", m: "💡全世界対応1つあると安心" },
+                        { t: "フリーズドライ日本食", m: "💡洋食に胃が疲れた時用" }
+                    ] 
+                },
+                { 
+                    name: "大自然・アクティビティ🐨", style: "nature", 
+                    subs: [
+                        { t: "ウィンドブレーカー", m: "💡朝夕の冷え込み対策" },
+                        { t: "偏光サングラス", m: "💡強い日差しから目を守る" },
+                        { t: "バックパック", m: "💡アクティブに動くため" },
+                        { t: "絆創膏(予備)", m: "💡靴ズレ・小さな怪我用" },
+                        { t: "水筒/タンブラー", m: "💡給水スポットが多いため" },
+                        { t: "強力保湿バーム", m: "💡激しい乾燥対策" }
+                    ] 
+                }
             ]
         },
         {
-            category: "🧴美容・バス用品（女性向け）",
-            gender: "female",
+            category: "💳 貴重品・ガジェット",
             items: [
-                { name: "スキンケア✨", subs: ["クレンジング🧼", "洗顔🫧", "導入液✨", "化粧水💧", "乳液🧴", "美容液✨", "クリーム🧴", "フェイシャルパック🎭"] },
-                { name: "メイク💄", subs: ["下地💄", "ファンデ🎨", "パウダー✨", "アイブロウ✏️", "アイシャドウ🎨", "マスカラ👁️", "チーク😊", "リップ💄"] },
-                { name: "ヘア・ボディケア🛁", subs: ["シャンプー類🧴", "ヘアオイル✨", "ボディクリーム🧴", "ヘアアイロン💇‍♀️", "ヘアブラシ🪮", "卓上ミラー🪞"] }
+                { name: "基本セット👛", subs: [{t:"財布・現金"}, {t:"身分証🪪"}, {t:"クレカ💳"}, {t:"予備財布"}] },
+                { name: "ガジェット🔋", subs: [{t:"スマホ📱"}, {t:"充電器🔌"}, {t:"モバイルバッテリー🔋"}, {t:"イヤホン🎧"}] },
+                { name: "海外必需品✈️", isOverseas: true, subs: [{t:"パスポート📕"}, {t:"パスポートコピー📄"}, {t:"Eチケット控え🎫"}, {t:"変換プラグ🔌"}] }
             ]
         },
         {
-            category: "👨身だしなみ・エチケット（男性向け）",
-            gender: "male",
+            category: "🧴 美容・ケア",
             items: [
-                { name: "フェイシャルケア🫧", subs: ["洗顔料（スクラブ/炭など）🫧", "オールインワンジェル🧴", "リップクリーム（無香料）🪞"] },
-                { name: "シェービング🪒", subs: ["髭剃り（使い慣れたもの）🪒", "シェービングジェル🫧", "アフターシェーブローション🧴"] },
-                { name: "ヘアケア・その他✂️", subs: ["ヘアワックス/ポマード💇‍♂️", "携帯用ヘアスプレー💨", "鼻毛カッター✂️", "爪切り💅"] },
-                { name: "ニオイ・日焼け対策☀️", subs: ["日焼け止め（ジェルタイプ）🧴", "ボディシート（汗対策）🧊", "携帯用香水/アトマイザー🌬️"] }
+                { name: "スキンケア✨", gender: "female", subs: [{t:"クレンジング🧼"}, {t:"洗顔🫧"}, {t:"化粧水・乳液🧴"}, {t:"美容液・クリーム"}, {t:"フェイスパック"}] },
+                { name: "スキンケア✨", gender: "male", subs: [{t:"スクラブ洗顔🫧"}, {t:"オールインワンジェル🧴"}, {t:"日焼け止め"}, {t:"リップクリーム"}] },
+                { name: "身だしなみ🪒", gender: "male", subs: [{t:"髭剃り🪒"}, {t:"シェービングジェル"}, {t:"ワックス💇‍♂️"}, {t:"鼻毛カッター"}] },
+                { name: "メイク💄", gender: "female", subs: [{t:"下地・ファンデ🎨"}, {t:"アイブロウ✏️"}, {t:"アイシャドウ・チーク"}, {t:"リップ💄"}] },
+                { name: "ヘアケア🛁", subs: [{t:"シャンプー類🧴"}, {t:"ヘアオイル✨"}, {t:"ヘアアイロン💇‍♀️"}, {t:"ヘアブラシ🪮"}] }
             ]
         },
         {
-            category: "👗衣類・日用品（共通/女性寄り）",
+            category: "👗 衣類・日用品",
             items: [
-                { name: "お洋服👕", hasQty: true, gender: "female", subs: ["着替え👕", "下着👙", "靴下・タイツ🧦"] }, // 女性向け数量あり
-                { name: "お洋服👕", hasQty: true, gender: "male", subs: ["シャツ・Tシャツ👕", "予備の白Tシャツ👕", "ズボン・スラックス👖", "下着（ボクサー等）🩳", "靴下🧦", "ベルト👔"] }, // 男性向け数量あり
-                { name: "おやすみ・ケア🛌", subs: ["パジャマ🛌", "着圧ソックス🧦", "室内スリッパ👟"] },
-                { name: "衛生用品🩹", subs: ["ハンカチ🧼", "ウェットティッシュ🫧", "絆創膏🩹", "除菌ジェル🫧", "生理用品🎀", "流せるティッシュ🧻"] },
-                { name: "お洗濯グッズ🧼", gender: "male", subs: ["ランドリーバッグ🛍️"] } // 男性向けに追加
-            ]
-        },
-        {
-            category: "🩹薬品類・海外特化（共通）",
-            items: [
-                { name: "常備薬💊", subs: ["鎮痛剤💊", "胃腸薬💊", "下痢止め💊", "正露丸🫙"] },
-                { name: "海外お役立ち✈️", isOverseas: true, subs: ["歯ブラシセット🪥", "携帯用スリッパ👟", "強力虫除け🦟"] }
-            ]
-        },
-        {
-            category: "📍地域・季節特化",
-            items: [
-                { name: "夏限定☀️", isSummer: true, subs: ["日傘⛱️", "日焼け止め🧴", "サングラス🕶️", "汗拭きシート🧊"] },
-                { name: "夏限定（男性向け）☀️", isSummer: true, gender: "male", subs: ["速乾Tシャツ👕", "短パン🩳", "帽子（キャップ）🧢", "スポーツサンダル🩴", "クールスプレー❄️"] },
-                { name: "冬限定❄️", isWinter: true, subs: ["使い捨てカイロ♨️", "マフラー🧣", "手袋（スマホ対応）🧤", "保湿バーム🍯", "ハンドクリーム🧴"] },
-                { name: "冬限定（男性向け）❄️", isWinter: true, gender: "male", subs: ["ヒートテック（上下）👕", "厚手セーター🧶", "インナーダウン🧥", "厚手の靴下🧦"] },
-                { name: "チップ・マナー国💵", target: ["usa", "europe"], subs: ["チップ用小額紙幣💵", "防犯バッグ🔒"] },
-                { name: "ドレスコード国👔", target: ["usa", "europe"], gender: "male", subs: ["襟付きシャツ👔", "革靴/クリーンな靴👟"] }, // 男性向け
-                { name: "韓国お役立ち🇰🇷", target: "korea", subs: ["WOWPASS💳", "美活用保冷バッグ❄️"] },
-                { name: "衛生注意国🌏", target: "thai", subs: ["携帯用ウォシュレット🚿🥢"] }
+                { name: "お洋服👕", hasQty: true, subs: [{t:"着替え（上下）👕"}, {t:"下着👙"}, {t:"靴下🧦"}, {t:"パジャマ🛌"}] },
+                { name: "お役立ちアイテム👔", gender: "male", subs: [{t:"予備の白Tシャツ"}, {t:"ベルト👔"}, {t:"ランドリーバッグ"}] },
+                { name: "衛生用品🩹", subs: [{t:"常備薬💊"}, {t:"正露丸/胃腸薬"}, {t:"絆創膏🩹"}, {t:"ウェットティッシュ🫧"}, {t:"ハンカチ🧼"}] }
             ]
         }
     ];
 
-    // ローカルストレージのキーをv11に更新（男女切り替え対応のためリセット）
-    let currentGender = localStorage.getItem('my_gender_v11') || 'female';
-    let customItems = JSON.parse(localStorage.getItem('my_custom_v11') || '[]');
-    let checkedItems = JSON.parse(localStorage.getItem('my_checked_v11') || '[]');
-    let deletedItems = JSON.parse(localStorage.getItem('my_deleted_v11') || '[]');
-
-    function toggleCountry() {
-        document.getElementById('country-div').style.display = (document.getElementById('area').value === 'overseas') ? 'block' : 'none';
-    }
+    let currentGender = localStorage.getItem('gender_v16') || 'female';
+    let checkedItems = JSON.parse(localStorage.getItem('checked_v16') || '[]');
+    let deletedSubs = JSON.parse(localStorage.getItem('deleted_subs_v16') || '[]');
 
     function setGender(gender) {
         currentGender = gender;
-        localStorage.setItem('my_gender_v11', gender);
-        
-        // ボタンの見た目を更新
+        localStorage.setItem('gender_v16', gender);
+        document.getElementById('body').className = 'mode-' + gender;
         document.getElementById('btn-female').classList.toggle('active', gender === 'female');
         document.getElementById('btn-male').classList.toggle('active', gender === 'male');
-        
-        initList(); // リストを再描画
+        initList();
+    }
+
+    function toggleOverseas() {
+        const isOverseas = document.getElementById('area').value === 'overseas';
+        document.getElementById('style-div').style.display = isOverseas ? 'block' : 'none';
     }
 
     function initList() {
-        const todoContainer = document.getElementById('todo-list');
-        const doneContainer = document.getElementById('done-list');
-        todoContainer.innerHTML = '';
-        doneContainer.innerHTML = '';
-
+        const container = document.getElementById('todo-list');
+        container.innerHTML = '';
         const area = document.getElementById('area').value;
-        const country = document.getElementById('country').value;
-        const season = document.getElementById('season').value;
-        const nights = parseInt(document.getElementById('nights').value);
+        const currentStyle = document.getElementById('tripStyle').value;
+        const nights = parseInt(document.getElementById('nights').value) || 0;
 
         packingMaster.forEach(cat => {
-            // カテゴリー全体の性別フィルタ
-            if (cat.gender && cat.gender !== currentGender) return;
-
-            const catHeader = document.createElement('div');
-            catHeader.className = 'cat-title';
-            catHeader.innerText = cat.category;
-            let catHasItem = false;
-
+            if (cat.isOverseas && area === 'domestic') return;
+            
+            let itemsHtml = '';
             cat.items.forEach(item => {
-                // 条件フィルタリング
-                if (item.gender && item.gender !== currentGender) return; // アイテム個別の性別フィルタ
+                if (item.gender && item.gender !== currentGender) return;
                 if (item.isOverseas && area === 'domestic') return;
-                if (item.isSummer && season === 'winter') return;
-                if (item.isWinter && season === 'summer') return;
-                if (item.target && !Array.isArray(item.target) && item.target !== country) return;
-                if (item.target && Array.isArray(item.target) && !item.target.includes(country)) return;
-                if (deletedItems.includes(item.name)) return;
+                if (item.style && item.style !== currentStyle) return;
 
-                if (!catHasItem) { todoContainer.appendChild(catHeader); catHasItem = true; }
-                renderParentItem(item, nights);
-            });
-        });
+                const isChecked = checkedItems.includes(item.name);
+                let subsHtml = '';
 
-        // じぶんリスト
-        if (customItems.length > 0) {
-            const customHeader = document.createElement('div');
-            customHeader.className = 'cat-title';
-            customHeader.innerText = "🧸じぶんリスト";
-            todoContainer.appendChild(customHeader);
-            customItems.forEach(name => {
-                if (!deletedItems.includes(name)) renderParentItem({name: name, subs: []}, 0);
-            });
-        }
-    }
+                item.subs.forEach(sub => {
+                    const subId = `${item.name}_${sub.t}`;
+                    if (deletedSubs.includes(subId)) return;
 
-    function renderParentItem(item, nights) {
-        const isChecked = checkedItems.includes(item.name);
-        const div = document.createElement('div');
-        div.className = `item-row ${isChecked ? 'checked' : ''}`;
+                    const isSubChecked = localStorage.getItem('sub_' + subId) === 'true';
+                    subsHtml += `
+                        <div class="sub-item ${isSubChecked ? 'sub-checked' : ''}">
+                            <div class="sub-content" onclick="toggleSub('${subId}')">
+                                <div class="sub-check"></div>
+                                <div>
+                                    <span>${sub.t}</span>
+                                    ${sub.m ? `<span class="memo">${sub.m}</span>` : ''}
+                                </div>
+                            </div>
+                            <button class="btn-del-sub" onclick="deleteSub(event, '${subId}')">🗑️</button>
+                        </div>`;
+                });
 
-        let subHtml = "";
-        if (item.subs && item.subs.length > 0) {
-            subHtml = `<div class="sub-container">`;
-            item.subs.forEach(sub => {
-                const subKey = `sub_${currentGender}_${item.name}_${sub}`; // 性別をキーに含める
-                const isSubChecked = localStorage.getItem(subKey) === 'true';
-                subHtml += `
-                    <div class="sub-item ${isSubChecked ? 'sub-checked' : ''}" onclick="event.stopPropagation(); toggleSub(this, '${subKey}')">
-                        <div class="sub-check"></div>${sub}
+                const qtyText = item.hasQty ? ` <small style="color:var(--sub)">[${nights+1}点]</small>` : "";
+
+                itemsHtml += `
+                    <div class="item-row ${isChecked ? 'checked' : ''}">
+                        <div class="item-main-flex">
+                            <div class="item-main" onclick="toggleParent('${item.name}')">
+                                <div class="check-box"></div>
+                                <span class="item-label">${item.name}${qtyText}</span>
+                            </div>
+                        </div>
+                        ${subsHtml ? `<div class="sub-container">${subsHtml}</div>` : ''}
                     </div>`;
             });
-            subHtml += `</div>`;
-        }
 
-        const qtyText = item.hasQty ? `<small style="color:var(--sub);margin-left:5px;"> [${nights+1}枚]</small>` : "";
-
-        div.innerHTML = `
-            <div class="item-main-flex">
-                <div class="item-main" onclick="toggleParent('${item.name}')">
-                    <div class="check-box"></div>
-                    <span class="parent-label">${item.name}${qtyText}</span>
-                </div>
-                <button class="btn-delete" onclick="deleteItem('${item.name}')">🗑️</button>
-            </div>
-            ${subHtml}
-        `;
-
-        if (isChecked) {
-            document.getElementById('done-list').appendChild(div);
-        } else {
-            document.getElementById('todo-list').appendChild(div);
-        }
+            if (itemsHtml) {
+                container.innerHTML += `<div class="cat-title">${cat.category}</div>` + itemsHtml;
+            }
+        });
     }
 
     function toggleParent(name) {
-        // 同じ名前のアイテムが男女である場合、現在表示されている方だけを操作
         if (checkedItems.includes(name)) {
             checkedItems = checkedItems.filter(i => i !== name);
         } else {
@@ -346,50 +308,42 @@
         initList();
     }
 
-    function toggleSub(el, key) {
-        const isNowChecked = el.classList.toggle('sub-checked');
-        localStorage.setItem(key, isNowChecked);
+    function toggleSub(id) {
+        const key = 'sub_' + id;
+        const val = localStorage.getItem(key) === 'true';
+        localStorage.setItem(key, !val);
+        initList();
     }
 
-    function deleteItem(name) {
-        if (confirm(`${name}を非表示にしますか？`)) {
-            deletedItems.push(name);
+    function deleteSub(event, id) {
+        event.stopPropagation(); 
+        if (confirm('この項目を削除しますか？')) {
+            deletedSubs.push(id);
             save();
-            initList();
-        }
-    }
-
-    function addCustomItem() {
-        const input = document.getElementById('custom-input');
-        if (input.value.trim()) {
-            customItems.push(input.value.trim() + "🏷️");
-            save();
-            input.value = '';
             initList();
         }
     }
 
     function resetAll() {
-        if (confirm("全てのチェックを解除しますか？")) {
-            checkedItems = [];
+        if (confirm('すべてのチェックと削除をリセットしますか？')) {
+            const genderBackup = currentGender;
             localStorage.clear();
-            localStorage.setItem('my_gender_v11', currentGender); // 性別設定だけ戻す
-            save();
-            initList();
+            checkedItems = []; 
+            deletedSubs = [];
+            localStorage.setItem('gender_v16', genderBackup);
+            setGender(genderBackup);
         }
     }
 
     function save() {
-        localStorage.setItem('my_custom_v11', JSON.stringify(customItems));
-        localStorage.setItem('my_checked_v11', JSON.stringify(checkedItems));
-        localStorage.setItem('my_deleted_v11', JSON.stringify(deletedItems));
+        localStorage.setItem('checked_v16', JSON.stringify(checkedItems));
+        localStorage.setItem('deleted_subs_v16', JSON.stringify(deletedSubs));
     }
 
-    // 初期化
-    window.onload = () => {
-        setGender(currentGender); // 保存されている性別を適用
-        toggleCountry();
-    };
+    window.addEventListener('DOMContentLoaded', () => {
+        toggleOverseas();
+        setGender(currentGender);
+    });
 </script>
 </body>
 </html>
