@@ -1,313 +1,845 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Trip Packing ✨</title>
-    <style>
-        :root {
-            --bg-female: #faf7f2; --main-female: #d1b799; --sub-female: #b5a18d; --accent-female: #eaddcf; --text-female: #5c544e; --done-female: #f2f0ed;
-            --bg-male: #f0f2f5; --main-male: #6789a4; --sub-male: #4a6375; --accent-male: #cbd5e0; --text-male: #2d3748; --done-male: #e2e8f0;
-        }
-        body.mode-female { --bg: var(--bg-female); --main: var(--main-female); --sub: var(--sub-female); --accent: var(--accent-female); --text: var(--text-female); --done-bg: var(--done-female); }
-        body.mode-male { --bg: var(--bg-male); --main: var(--main-male); --sub: var(--sub-male); --accent: var(--accent-male); --text: var(--text-male); --done-bg: var(--done-male); }
-        body { font-family: 'Hiragino Maru Gothic ProN', 'Meiryo', sans-serif; background-color: var(--bg); color: var(--text); padding: 15px; margin: 0; line-height: 1.4; transition: 0.3s; }
-        .container { max-width: 550px; margin: 0 auto; background: white; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px; border: 1px solid rgba(0,0,0,0.02); }
-        h1 { text-align: center; color: var(--main); font-size: 1.3rem; margin: 10px 0 15px; letter-spacing: 1px; }
-        .gender-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .gender-btn { flex: 1; background: #fff; border: 2px solid var(--accent); color: var(--sub); padding: 12px; border-radius: 15px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 0.9rem; outline: none; }
-        .gender-btn.active { background: var(--main); border-color: var(--main); color: white; }
-        .config { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #fdfcfb; padding: 18px; border-radius: 20px; border: 1px solid #f0ede9; }
-        .full { grid-column: span 2; }
-        label { font-size: 0.75rem; font-weight: bold; color: var(--sub); margin-bottom: 4px; display: block; }
-        select, input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--accent); box-sizing: border-box; font-family: inherit; font-size: 0.9rem; background: white; color: var(--text); }
-        
-        #country-info { margin-top: 15px; padding: 15px; background: #fff; border-radius: 15px; border: 2px solid var(--accent); display: none; }
-        #country-info h3 { margin: 0 0 8px; font-size: 0.9rem; color: var(--main); border-bottom: 1px dashed var(--accent); padding-bottom: 5px; }
-        #country-info p { margin: 4px 0; font-size: 0.75rem; line-height: 1.5; }
-        .rate-link { display: inline-block; margin-top: 8px; padding: 5px 12px; background: var(--main); color: white; border-radius: 20px; text-decoration: none; font-size: 0.7rem; font-weight: bold; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Trip Packing ✨</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      --bg-female:#faf7f2;--main-female:#d1b799;--sub-female:#b5a18d;--accent-female:#eaddcf;--text-female:#5c544e;--done-female:#f2f0ed;
+      --bg-male:#f0f2f5;--main-male:#6789a4;--sub-male:#4a6375;--accent-male:#cbd5e0;--text-male:#2d3748;--done-male:#e2e8f0;
+    }
+    body.mode-female{--bg:var(--bg-female);--main:var(--main-female);--sub:var(--sub-female);--accent:var(--accent-female);--text:var(--text-female);--done-bg:var(--done-female);}
+    body.mode-male{--bg:var(--bg-male);--main:var(--main-male);--sub:var(--sub-male);--accent:var(--accent-male);--text:var(--text-male);--done-bg:var(--done-male);}
+    *{box-sizing:border-box;}
+    body{font-family:'Hiragino Maru Gothic ProN','Meiryo',sans-serif;background:var(--bg);color:var(--text);margin:0;padding:52px 15px 20px;line-height:1.4;transition:background .3s;}
 
-        .btn-reset { grid-column: span 2; background: none; color: var(--sub); border: 1px solid var(--accent); padding: 10px; border-radius: 15px; font-size: 0.8rem; cursor: pointer; margin-top: 5px; }
-        .cat-title { font-size: 0.95rem; font-weight: bold; color: var(--sub); margin: 25px 0 12px; border-left: 4px solid var(--main); padding-left: 10px; }
-        
-        .item-row { background: #fff; border: 1px solid #f0ede9; padding: 12px 15px; border-radius: 18px; margin-bottom: 10px; transition: 0.3s ease; }
-        .item-row.checked { background: var(--done-bg); border-color: transparent; opacity: 0.5; }
-        
-        .item-main { display: flex; align-items: center; cursor: pointer; flex: 1; font-weight: bold; font-size: 0.9rem; }
-        .check-box { width: 20px; height: 20px; border: 2px solid var(--accent); border-radius: 50%; margin-right: 12px; position: relative; flex-shrink: 0; background: white; }
-        .checked .check-box { background: var(--main); border-color: var(--main); }
-        .checked .check-box::after { content: '✓'; color: white; position: absolute; left: 4px; top: -1px; font-weight: bold; }
-        .checked .item-label { text-decoration: line-through; color: #b5b5b5; }
-        
-        .sub-container { margin: 10px 0 0 32px; padding: 8px; background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px dashed var(--accent); }
-        .sub-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; }
-        .sub-content { display: flex; align-items: flex-start; cursor: pointer; flex: 1; }
-        .sub-check { width: 16px; height: 16px; border: 1.5px solid var(--accent); border-radius: 4px; margin-right: 8px; background: white; position: relative; flex-shrink: 0; margin-top: 2px; }
-        .sub-checked .sub-check { background: var(--sub); border-color: var(--sub); }
-        .sub-checked .sub-check::after { content: '✓'; color: white; font-size: 10px; position: absolute; left: 2px; top: -1px; }
-        .sub-checked span { text-decoration: line-through; color: #b5b5b5; }
-        .memo { display: block; font-size: 0.7rem; color: #999; margin-top: 2px; line-height: 1.2; font-weight: normal; }
-        .btn-del-sub { background: none; border: none; color: #dcd6d0; cursor: pointer; font-size: 0.9rem; padding: 5px; }
-        
-        /* 完了セクション */
-        #done-section { margin-top: 30px; border-top: 2px dashed var(--accent); padding-top: 20px; }
-        .done-header { text-align: center; font-size: 0.8rem; color: var(--sub); font-weight: bold; margin-bottom: 15px; }
-    </style>
+    /* ── Fixed top bar ── */
+    #top-bar{position:fixed;top:0;left:0;right:0;z-index:1000;background:white;border-bottom:1px solid var(--accent);padding:7px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+    #progress-bar-wrap{flex:1;background:var(--accent);border-radius:10px;height:8px;overflow:hidden;}
+    #progress-fill{height:100%;background:var(--main);border-radius:10px;transition:width .4s ease;width:0%;}
+    #progress-text{font-size:.7rem;color:var(--sub);white-space:nowrap;font-weight:bold;}
+    #countdown-text{font-size:.72rem;color:var(--main);white-space:nowrap;font-weight:bold;}
+
+    /* ── Container ── */
+    .container{max-width:550px;margin:0 auto;background:white;border-radius:30px;box-shadow:0 10px 30px rgba(0,0,0,.05);padding:20px;border:1px solid rgba(0,0,0,.02);}
+    h1{text-align:center;color:var(--main);font-size:1.3rem;margin:10px 0 15px;letter-spacing:1px;}
+
+    /* ── Gender switch ── */
+    .gender-switch{display:flex;justify-content:center;gap:10px;margin-bottom:20px;}
+    .gender-btn{flex:1;background:#fff;border:2px solid var(--accent);color:var(--sub);padding:12px;border-radius:15px;cursor:pointer;font-weight:bold;transition:.3s;font-size:.9rem;outline:none;}
+    .gender-btn.active{background:var(--main);border-color:var(--main);color:white;}
+
+    /* ── Config ── */
+    .config{display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#fdfcfb;padding:18px;border-radius:20px;border:1px solid #f0ede9;}
+    .full{grid-column:span 2;}
+    label{font-size:.75rem;font-weight:bold;color:var(--sub);margin-bottom:4px;display:block;}
+    select,input[type=number],input[type=date]{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--accent);font-family:inherit;font-size:.9rem;background:white;color:var(--text);}
+    .btn-reset{grid-column:span 2;background:none;color:var(--sub);border:1px solid var(--accent);padding:10px;border-radius:15px;font-size:.8rem;cursor:pointer;margin-top:5px;}
+
+    /* ── Country info ── */
+    #country-info{margin-top:15px;padding:15px;background:#fff;border-radius:15px;border:2px solid var(--accent);display:none;}
+    #country-info h3{margin:0 0 8px;font-size:.9rem;color:var(--main);border-bottom:1px dashed var(--accent);padding-bottom:5px;}
+    #country-info p{margin:4px 0;font-size:.75rem;line-height:1.6;}
+    .temp-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:bold;margin-left:6px;}
+    .temp-cold{background:#e3f0ff;color:#1565c0;}
+    .temp-cool{background:#e8f5e9;color:#2e7d32;}
+    .temp-mild{background:#fff8e1;color:#f57f17;}
+    .temp-hot{background:#fce4ec;color:#c62828;}
+    .ng-section{margin-top:10px;padding:10px 12px;background:#fff5f5;border-radius:10px;border:1px solid #ffd0d0;}
+    .ng-title{font-size:.75rem;font-weight:bold;color:#c62828;margin-bottom:5px;}
+    .ng-item{font-size:.72rem;color:#555;line-height:1.7;}
+    .rate-link{display:inline-block;margin-top:8px;padding:5px 12px;background:var(--main);color:white;border-radius:20px;text-decoration:none;font-size:.7rem;font-weight:bold;}
+
+    /* ── Scene filter ── */
+    #scene-section{margin-top:18px;padding:14px;background:#fdfcfb;border-radius:16px;border:1px solid #f0ede9;display:none;}
+    .scene-section-label{font-size:.75rem;font-weight:bold;color:var(--sub);margin-bottom:10px;display:block;}
+    .scene-chips{display:flex;flex-wrap:wrap;gap:8px;}
+    .scene-chip{padding:6px 14px;border-radius:20px;border:1.5px solid var(--accent);font-size:.78rem;font-weight:bold;color:var(--sub);background:white;cursor:pointer;transition:.2s;}
+    .scene-chip.active{background:var(--main);border-color:var(--main);color:white;}
+    .scene-chip.suggested{border-color:var(--main);color:var(--main);}
+    .scene-chip.suggested::after{content:' ★';font-size:.65rem;}
+
+    /* ── Category ── */
+    .cat-title{font-size:.95rem;font-weight:bold;color:var(--sub);margin:25px 0 12px;border-left:4px solid var(--main);padding-left:10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;}
+    .cat-toggle{font-size:.7rem;transition:transform .2s;margin-left:6px;}
+    .cat-title.collapsed .cat-toggle{transform:rotate(-90deg);}
+    .cat-body.hidden{display:none;}
+
+    /* ── Item rows ── */
+    .item-row{background:#fff;border:1px solid #f0ede9;padding:12px 15px;border-radius:18px;margin-bottom:10px;transition:.3s ease;}
+    .item-row.checked{background:var(--done-bg);border-color:transparent;opacity:.5;}
+    .item-row.flagged{border-left:3px solid #f59e0b;background:#fffbf0;}
+    .item-row.flagged.checked{opacity:.45;}
+    .item-header{display:flex;align-items:center;justify-content:space-between;}
+    .item-main{display:flex;align-items:center;cursor:pointer;flex:1;font-weight:bold;font-size:.9rem;}
+    .check-box{width:20px;height:20px;border:2px solid var(--accent);border-radius:50%;margin-right:12px;position:relative;flex-shrink:0;background:white;transition:.2s;}
+    .checked .check-box{background:var(--main);border-color:var(--main);}
+    .checked .check-box::after{content:'✓';color:white;position:absolute;left:4px;top:-1px;font-weight:bold;}
+    .checked .item-label{text-decoration:line-through;color:#b5b5b5;}
+    .btn-flag{background:none;border:none;cursor:pointer;font-size:.85rem;padding:5px;opacity:.25;transition:opacity .2s;line-height:1;}
+    .btn-flag:hover{opacity:.8;}
+    .flagged .btn-flag{opacity:1;}
+    .btn-del-custom{background:none;border:none;cursor:pointer;font-size:.8rem;padding:5px;color:#ddd;line-height:1;}
+    .btn-del-custom:hover{color:#f87171;}
+
+    /* ── Sub items ── */
+    .sub-container{margin:10px 0 0 32px;padding:8px;background:rgba(0,0,0,.02);border-radius:12px;border:1px dashed var(--accent);}
+    .sub-item{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:.8rem;}
+    .sub-content{display:flex;align-items:flex-start;cursor:pointer;flex:1;}
+    .sub-check{width:16px;height:16px;border:1.5px solid var(--accent);border-radius:4px;margin-right:8px;background:white;position:relative;flex-shrink:0;margin-top:2px;}
+    .sub-checked .sub-check{background:var(--sub);border-color:var(--sub);}
+    .sub-checked .sub-check::after{content:'✓';color:white;font-size:10px;position:absolute;left:2px;top:-1px;}
+    .sub-checked span{text-decoration:line-through;color:#b5b5b5;}
+    .memo{display:block;font-size:.7rem;color:#999;margin-top:2px;line-height:1.2;font-weight:normal;}
+    .btn-del-sub{background:none;border:none;color:#dcd6d0;cursor:pointer;font-size:.9rem;padding:5px;}
+
+    /* ── Done & flagged sections ── */
+    #done-section{margin-top:30px;border-top:2px dashed var(--accent);padding-top:20px;}
+    .done-header{text-align:center;font-size:.8rem;color:var(--sub);font-weight:bold;margin-bottom:15px;}
+    #flagged-section{margin-top:20px;padding:14px;background:#fffbf0;border-radius:16px;border:1px dashed #f59e0b;display:none;}
+    .flagged-header{font-size:.8rem;font-weight:bold;color:#d97706;margin-bottom:10px;}
+
+    /* ── Add custom item ── */
+    .add-item-wrap{margin-top:20px;}
+    .add-form{display:none;background:#fafafa;border-radius:15px;padding:15px;border:1px solid var(--accent);margin-bottom:10px;}
+    .add-form.visible{display:block;}
+    .add-form input[type=text]{width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--accent);font-family:inherit;font-size:.85rem;color:var(--text);background:white;margin-bottom:8px;}
+    .btn-add-confirm{background:var(--main);color:white;border:none;padding:10px 20px;border-radius:12px;font-family:inherit;font-size:.85rem;font-weight:bold;cursor:pointer;}
+    .btn-add-cancel{background:none;color:var(--sub);border:1px solid var(--accent);padding:10px 20px;border-radius:12px;font-family:inherit;font-size:.85rem;cursor:pointer;margin-left:8px;}
+    .btn-add-open{width:100%;background:none;border:2px dashed var(--accent);color:var(--sub);padding:12px;border-radius:15px;font-family:inherit;font-size:.85rem;cursor:pointer;font-weight:bold;transition:.2s;}
+    .btn-add-open:hover{border-color:var(--main);color:var(--main);}
+
+    /* ── Action buttons ── */
+    .action-buttons{display:flex;gap:10px;margin-top:20px;}
+    .btn-action{flex:1;padding:12px;border-radius:15px;border:1px solid var(--accent);background:white;color:var(--sub);font-family:inherit;font-size:.8rem;font-weight:bold;cursor:pointer;transition:.2s;}
+    .btn-action:hover{background:var(--accent);}
+    .btn-action.primary{background:var(--main);color:white;border-color:var(--main);}
+    .btn-action.primary:hover{opacity:.85;}
+
+    /* ── Print ── */
+    @media print{
+      body{padding-top:0!important;background:white!important;}
+      #top-bar,.gender-switch,.action-buttons,.add-item-wrap,#scene-section,.btn-flag,.btn-del-sub,.btn-del-custom,.btn-reset,.no-print{display:none!important;}
+      .container{box-shadow:none!important;border:none!important;border-radius:0!important;max-width:100%!important;padding:0!important;}
+      .item-row.checked{opacity:1!important;background:#f5f5f5!important;}
+      .cat-body.hidden{display:block!important;}
+    }
+  </style>
 </head>
 <body id="body" class="mode-female">
 
-<div class="container">
-    <h1>🧺 My Packing List</h1>
+<!-- Fixed top info bar -->
+<div id="top-bar">
+  <div id="progress-bar-wrap">
+    <div id="progress-fill"></div>
+  </div>
+  <span id="progress-text">0/0</span>
+  <span id="countdown-text"></span>
+</div>
 
-    <div class="gender-switch">
-        <button id="btn-female" class="gender-btn" onclick="setGender('female')">👩 女性向け</button>
-        <button id="btn-male" class="gender-btn" onclick="setGender('male')">👨 男性向け</button>
-    </div>
+<div class="container" id="main-content">
+  <h1>🧺 My Packing List</h1>
 
-    <div class="config">
-        <div>
-            <label>🌏 エリア</label>
-            <select id="area" onchange="saveConfig(); toggleOverseas(); initList();">
-                <option value="domestic">国内旅行🇯🇵</option>
-                <option value="overseas">海外旅行✈️</option>
-            </select>
-        </div>
-        <div>
-            <label>🌙 宿泊数</label>
-            <input type="number" id="nights" value="1" min="0" onchange="saveConfig(); initList()">
-        </div>
-        <div id="style-div" class="full" style="display:none;">
-            <label>📍 渡航先セレクト</label>
-            <select id="tripStyle" onchange="saveConfig(); initList()">
-                <option value="none">--- 選択してください ---</option>
-                <optgroup label="■ 東アジア">
-                    <option value="korea">韓国 🇰🇷</option>
-                    <option value="taiwan">台湾 🇹🇼</option>
-                    <option value="hongkong">香港 🇭🇰</option>
-                </optgroup>
-                <optgroup label="■ 東南アジア">
-                    <option value="thailand">タイ 🇹🇭</option>
-                    <option value="vietnam">ベトナム 🇻🇳</option>
-                    <option value="philippines">フィリピン 🇵🇭</option>
-                    <option value="singapore">シンガポール 🇸🇬</option>
-                    <option value="malaysia">マレーシア 🇲🇾</option>
-                    <option value="indonesia">インドネシア(バリ) 🇮🇩</option>
-                </optgroup>
-                <optgroup label="■ 北米・ハワイ">
-                    <option value="usa">アメリカ・ハワイ 🇺🇸</option>
-                    <option value="guam">グアム 🇬🇺</option>
-                </optgroup>
-                <optgroup label="■ ヨーロッパ">
-                    <option value="france">フランス 🇫🇷</option>
-                    <option value="italy">イタリア 🇮🇹</option>
-                    <option value="uk">イギリス 🇬🇧</option>
-                    <option value="spain">スペイン 🇪🇸</option>
-                    <option value="portugal">ポルトガル 🇵🇹</option>
-                    <option value="germany">ドイツ 🇩🇪</option>
-                    <option value="swiss">スイス 🇨🇭</option>
-                </optgroup>
-                <optgroup label="■ オセアニア">
-                    <option value="australia">オーストラリア 🇦🇺</option>
-                    <option value="nz">ニュージーランド 🇳🇿</option>
-                </optgroup>
-                <option value="other">その他・他国</option>
-            </select>
-            <div id="country-info"></div>
-        </div>
-        <button class="btn-reset" onclick="resetAll()">リストをリセット🔄</button>
-    </div>
+  <div class="gender-switch">
+    <button id="btn-female" class="gender-btn" onclick="setGender('female')">👩 女性向け</button>
+    <button id="btn-male" class="gender-btn" onclick="setGender('male')">👨 男性向け</button>
+  </div>
 
-    <div id="todo-list"></div>
-    
-    <div id="done-section" style="display:none;">
-        <div class="done-header">── 準備完了（CHECKED） ──</div>
-        <div id="done-list"></div>
+  <div class="config">
+    <div>
+      <label>🌏 エリア</label>
+      <select id="area" onchange="saveConfig();toggleOverseas();initList();">
+        <option value="domestic">国内旅行🇯🇵</option>
+        <option value="overseas">海外旅行✈️</option>
+      </select>
     </div>
+    <div>
+      <label>🌙 宿泊数</label>
+      <input type="number" id="nights" value="1" min="0" onchange="saveConfig();initList()">
+    </div>
+    <div>
+      <label>📅 出発月</label>
+      <select id="travelMonth" onchange="saveConfig();updateCountryInfo();">
+        <option value="">-- 月を選択 --</option>
+        <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option>
+        <option value="4">4月</option><option value="5">5月</option><option value="6">6月</option>
+        <option value="7">7月</option><option value="8">8月</option><option value="9">9月</option>
+        <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+      </select>
+    </div>
+    <div>
+      <label>✈️ 出発日</label>
+      <input type="date" id="departDate" onchange="saveConfig();updateCountdown();">
+    </div>
+    <div id="style-div" class="full" style="display:none;">
+      <label>📍 渡航先セレクト</label>
+      <select id="tripStyle" onchange="saveConfig();updateCountryInfo();updateSuggestedScenes();initList();">
+        <option value="none">--- 選択してください ---</option>
+        <optgroup label="■ 東アジア">
+          <option value="korea">韓国 🇰🇷</option>
+          <option value="taiwan">台湾 🇹🇼</option>
+          <option value="hongkong">香港 🇭🇰</option>
+        </optgroup>
+        <optgroup label="■ 東南アジア">
+          <option value="thailand">タイ 🇹🇭</option>
+          <option value="vietnam">ベトナム 🇻🇳</option>
+          <option value="philippines">フィリピン 🇵🇭</option>
+          <option value="singapore">シンガポール 🇸🇬</option>
+          <option value="malaysia">マレーシア 🇲🇾</option>
+          <option value="indonesia">インドネシア(バリ) 🇮🇩</option>
+        </optgroup>
+        <optgroup label="■ 北米・ハワイ">
+          <option value="usa">アメリカ・ハワイ 🇺🇸</option>
+          <option value="guam">グアム 🇬🇺</option>
+        </optgroup>
+        <optgroup label="■ ヨーロッパ">
+          <option value="france">フランス 🇫🇷</option>
+          <option value="italy">イタリア 🇮🇹</option>
+          <option value="uk">イギリス 🇬🇧</option>
+          <option value="spain">スペイン 🇪🇸</option>
+          <option value="portugal">ポルトガル 🇵🇹</option>
+          <option value="germany">ドイツ 🇩🇪</option>
+          <option value="swiss">スイス 🇨🇭</option>
+        </optgroup>
+        <optgroup label="■ オセアニア">
+          <option value="australia">オーストラリア 🇦🇺</option>
+          <option value="nz">ニュージーランド 🇳🇿</option>
+        </optgroup>
+        <option value="other">その他・他国</option>
+      </select>
+      <div id="country-info"></div>
+    </div>
+    <button class="btn-reset no-print" onclick="resetAll()">リストをリセット🔄</button>
+  </div>
+
+  <!-- Scene filter (overseas only) -->
+  <div id="scene-section" class="no-print">
+    <span class="scene-section-label">🎯 旅のシーンで絞り込む（複数選択可）<br><small style="font-weight:normal;color:#bbb;">★ = この国におすすめ</small></span>
+    <div class="scene-chips">
+      <button class="scene-chip" data-scene="sightseeing" onclick="toggleScene('sightseeing')">🗼 観光メイン</button>
+      <button class="scene-chip" data-scene="beach"       onclick="toggleScene('beach')">🏖️ ビーチ</button>
+      <button class="scene-chip" data-scene="business"    onclick="toggleScene('business')">💼 ビジネス</button>
+      <button class="scene-chip" data-scene="outdoor"     onclick="toggleScene('outdoor')">🏔️ アウトドア</button>
+      <button class="scene-chip" data-scene="gourmet"     onclick="toggleScene('gourmet')">🍽️ グルメ</button>
+    </div>
+  </div>
+
+  <div id="todo-list"></div>
+
+  <!-- Add custom item -->
+  <div class="add-item-wrap no-print">
+    <div class="add-form" id="add-form">
+      <label>📝 アイテム名</label>
+      <input type="text" id="custom-name" placeholder="例：水着、変換プラグ…">
+      <label style="margin-top:6px;">💬 メモ（任意）</label>
+      <input type="text" id="custom-memo" placeholder="例：コンビニで買う、Mサイズ">
+      <div style="margin-top:10px;">
+        <button class="btn-add-confirm" onclick="addCustomItem()">＋ 追加する</button>
+        <button class="btn-add-cancel" onclick="hideAddForm()">キャンセル</button>
+      </div>
+    </div>
+    <button class="btn-add-open" id="btn-add-open" onclick="showAddForm()">＋ カスタムアイテムを追加する</button>
+  </div>
+
+  <div id="done-section" style="display:none;">
+    <div class="done-header">── 準備完了（CHECKED） ──</div>
+    <div id="done-list"></div>
+  </div>
+
+  <div class="action-buttons no-print">
+    <button class="btn-action" onclick="window.print()">🖨️ 印刷</button>
+    <button class="btn-action primary" onclick="exportPDF()">📄 PDF保存</button>
+  </div>
 </div>
 
 <script>
-    // （国データ・マスターデータは前回と同じため省略せず維持）
-    const countryData = {
-        korea: { currency: "ウォン", tip: "原則不要", items: [{t:"変換プラグ(C/SE)",m:"💡コンセント形状が日本と異なるため📝"}, {t:"WOWPASS等決済アプリ",m:"💡キャッシュレス決済が主流なため📝"}], memo: "アプリで移動も支払いもスムーズになります。" },
-        taiwan: { currency: "元（TWD）", tip: "原則不要(高級店のみ10%)", items: [{t:"悠遊カード",m:"💡電車やコンビニで必須な交通IC📝"}, {t:"夜市用の胃腸薬",m:"💡食べ歩きを楽しむお守りに📝"}], memo: "胃腸薬があると安心感が違います。" },
-        hongkong: { currency: "香港ドル", tip: "原則不要(お釣りの端数程度)", items: [{t:"変換プラグ(BF)",m:"💡コンセント形状が異なるため📝"}, {t:"羽織もの",m:"💡強烈な冷房対策に📝"}], memo: "真夏でも建物内は極寒です。" },
-        thailand: { currency: "バーツ", tip: "基本不要(マッサージ等は20〜50B)", items: [{t:"露出控えめの服",m:"💡寺院拝観のマナーとして📝"}, {t:"強力な虫除け",m:"💡蚊を介した感染症対策に📝"}], memo: "寺院では肩・膝を隠す必要があります。" },
-        vietnam: { currency: "ドン", tip: "基本不要(端数切り上げ程度)", items: [{t:"紫外線対策グッズ",m:"💡日差しが非常に強いため📝"}, {t:"マスク",m:"💡バイクの排気ガス対策に📝"}], memo: "移動中の排気ガスにはマスクが有効。" },
-        philippines: { currency: "ペソ", tip: "20〜50ペソ程度", items: [{t:"除菌ジェル",m:"💡衛生面への配慮として📝"}, {t:"トイレットペーパー",m:"💡備え付けがない場所が多いため📝"}], memo: "紙は常に持ち歩くのが吉。" },
-        singapore: { currency: "シンガポールドル", tip: "不要(サービス料込)", items: [{t:"変換プラグ(BF)",m:"💡コンセント形状が異なるため📝"}, {t:"羽織もの",m:"💡ショッピングモール等の冷房対策📝"}], memo: "ガムの持ち込みは禁止されています。" },
-        malaysia: { currency: "リンギット", tip: "原則不要", items: [{t:"変換プラグ(BF)",m:"💡コンセント形状が異なるため📝"}, {t:"大判ストール",m:"💡宗教施設での肌隠しに📝"}], memo: "モスク観光にはストールが便利。" },
-        indonesia: { currency: "ルピア", tip: "5,000〜2万ルピア", items: [{t:"水に流せるウェットティッシュ",m:"💡衛生対策・トイレ用📝"}, {t:"懐中電灯",m:"💡夜道の暗い場所対策に📝"}], memo: "舗装されていない夜道に備えて。" },
-        usa: { currency: "USドル", tip: "必須(18%〜25%)", items: [{t:"1ドル札を多めに",m:"💡チップ支払いをスムーズにするため📝"}, {t:"クレカ2枚以上",m:"💡決済不可時や身分証代わりに📝"}, {t:"パスポート",m:"💡お酒購入等の年齢確認に📝"}], memo: "チップ用現金は到着後早めに用意を。" },
-        guam: { currency: "USドル", tip: "必須(15%〜20%)", items: [{t:"1ドル札を20枚〜",m:"💡チップ用に必須📝"}, {t:"マリンシューズ",m:"💡サンゴや岩場で足を保護するため📝"}], memo: "海を楽しむならシューズは必須。" },
-        france: { currency: "ユーロ", tip: "原則不要(謝礼程度)", items: [{t:"厚底スニーカー",m:"💡足に負担がかかる石畳対策📝"}, {t:"丈夫なエコバッグ",m:"💡買い物時の袋が有料・弱いため📝"}], memo: "歩きやすさを最優先しましょう。" },
-        italy: { currency: "ユーロ", tip: "原則不要(テーブル料込)", items: [{t:"セキュリティポーチ",m:"💡多発するスリから貴重品を守る📝"}, {t:"ヘアオイル",m:"💡硬水による髪のパサつき防止📝"}], memo: "防犯対策は日本以上にしっかりと。" },
-        uk: { currency: "ポンド", tip: "不要な場合が多い(12.5%加算確認)", items: [{t:"変換プラグ(BF)",m:"💡コンセント形状が異なるため📝"}, {t:"折りたたみ傘",m:"💡天気が変わりやすいため📝"}], memo: "1日に四季があると言われるほど不安定。" },
-        spain: { currency: "ユーロ", tip: "不要(少額の小銭程度)", items: [{t:"胃腸薬",m:"💡夜20時以降の遅い夕食対策📝"}, {t:"強力な日焼け止め",m:"💡日差しが強烈なため📝"}], memo: "食事の時間が遅いので体調管理を。" },
-        portugal: { currency: "ユーロ", tip: "義務ではない(5〜10%推奨)", items: [{t:"滑り止め付きの靴",m:"💡タイル張りの坂道が滑るため📝"}], memo: "雨が降るとタイルは非常に滑ります。" },
-        germany: { currency: "ユーロ", tip: "5〜10%(切り上げ)", items: [{t:"エコバッグ",m:"💡袋が完全有料なため📝"}, {t:"日曜用の食料",m:"💡日曜は店が完全に閉まるため📝"}], memo: "土曜のうちに買い出しを済ませて。" },
-        swiss: { currency: "スイス・フラン", tip: "原則不要", items: [{t:"高性能サングラス",m:"💡雪や氷の照り返し対策📝"}, {t:"変換プラグ(C/J)",m:"💡特殊な形状があるため📝"}], memo: "山へ行くなら紫外線対策は厳重に。" },
-        australia: { currency: "豪ドル", tip: "基本不要", items: [{t:"高性能サングラス",m:"💡非常に強い紫外線から目を守る📝"}, {t:"タンブラー",m:"💡街中の給水スポット利用に📝"}, {t:"変換プラグ(O)",m:"💡ハの字型の形状なため📝"}], memo: "日焼け止めも現地調達がおすすめなほど強いです。" },
-        nz: { currency: "NZドル", tip: "基本不要", items: [{t:"調節しやすい防寒着",m:"💡天候変化が激しく冷え込むため📝"}, {t:"日焼け止め",m:"💡オゾン層の関係で紫外線が強いため📝"}], memo: "靴底の泥汚れ等の持ち込み制限に注意。" },
-        other: { currency: "現地通貨", tip: "要確認", items: [{t:"変換プラグ",m:"💡渡航先の形状を確認📝"}, {t:"モバイルバッテリー",m:"💡慣れない土地での電池切れ対策📝"}], memo: "事前に現地のマナーを調べましょう。" }
-    };
+// ─── Storage version ───────────────────────────────────────────────────────
+const SV = 'v17';
 
-    const packingMaster = [
-        { category: "💳 貴重品・ガジェット", items: [
-            { name: "基本セット👛", subs: [{t:"財布・現金"}, {t:"身分証🪪"}, {t:"クレカ💳"}] },
-            { name: "ガジェット🔋", subs: [{t:"スマホ📱"}, {t:"充電器🔌"}, {t:"モバイルバッテリー🔋"}] },
-            { name: "海外必需品✈️", isOverseas: true, subs: [{t:"パスポート📕"}, {t:"航空券控え🎫"}] }
-        ]},
-        { category: "🧴 美容・ケア", items: [
-            { name: "スキンケア✨", gender: "female", subs: [{t:"クレンジング"}, {t:"洗顔"}, {t:"化粧水・乳液"}, {t:"フェイスパック"}] },
-            { name: "スキンケア✨", gender: "male", subs: [{t:"スクラブ洗顔"}, {t:"オールインワン"}, {t:"日焼け止め"}] },
-            { name: "メイク/身だしなみ", gender: "female", subs: [{t:"コスメ一式🎨"}, {t:"ヘアアイロン"}] },
-            { name: "身だしなみ🪒", gender: "male", subs: [{t:"髭剃り🪒"}, {t:"ワックス"}] }
-        ]},
-        { category: "👗 衣類・日用品", items: [
-            { name: "お洋服👕", hasQty: true, subs: [{t:"着替え（上下）"}, {t:"下着👙"}, {t:"靴下🧦"}] },
-            { name: "衛生用品🩹", subs: [{t:"常備薬💊"}, {t:"ウェットティッシュ"}, {t:"ハンカチ🧼"}] }
-        ]}
-    ];
+// ─── Country data (extended) ───────────────────────────────────────────────
+const countryData = {
+  korea:{
+    currency:"ウォン", tip:"原則不要",
+    tempByMonth:[2,4,10,16,22,26,29,30,25,18,10,4],
+    ngItems:[{t:"麻薬類（大麻含む）",m:"🚨所持・使用は重罪"},{t:"未申告の食品・肉類",m:"税関で没収・罰金"}],
+    suggestedScenes:["sightseeing","gourmet"],
+    items:[{t:"変換プラグ(C/SE型)",m:"💡コンセント形状が日本と異なるため📝"},{t:"WOWPASS等決済アプリ",m:"💡キャッシュレス決済が主流なため📝"}],
+    memo:"アプリで移動も支払いもスムーズになります。"
+  },
+  taiwan:{
+    currency:"元（TWD）", tip:"原則不要（高級店のみ10%）",
+    tempByMonth:[16,17,19,23,27,30,33,33,29,25,22,17],
+    ngItems:[{t:"農産物・果物（未申告）",m:"🚨検疫あり、要申告"},{t:"銃・刃物類",m:"持込厳禁"}],
+    suggestedScenes:["sightseeing","gourmet"],
+    items:[{t:"悠遊カード",m:"💡電車やコンビニで必須な交通IC📝"},{t:"夜市用の胃腸薬",m:"💡食べ歩きを楽しむお守りに📝"}],
+    memo:"胃腸薬があると安心感が違います。"
+  },
+  hongkong:{
+    currency:"香港ドル", tip:"原則不要（お釣りの端数程度）",
+    tempByMonth:[17,17,20,24,28,30,32,32,30,27,23,19],
+    ngItems:[{t:"電子タバコ・加熱式たばこ",m:"🚨販売・所持は違法"},{t:"液体類（100ml超）機内持込",m:"通常の機内持込規制に注意"}],
+    suggestedScenes:["sightseeing","gourmet"],
+    items:[{t:"変換プラグ(BF型)",m:"💡コンセント形状が異なるため📝"},{t:"羽織もの",m:"💡強烈な冷房対策に📝"}],
+    memo:"真夏でも建物内は極寒です。"
+  },
+  thailand:{
+    currency:"バーツ", tip:"基本不要（マッサージ等は20〜50B）",
+    tempByMonth:[28,29,31,33,34,32,31,31,31,30,29,27],
+    ngItems:[{t:"王室批判の印刷物・メディア",m:"🚨不敬罪で逮捕の可能性"},{t:"麻薬類",m:"🚨死刑を含む厳罰"},{t:"仏像・仏教美術品（持出し）",m:"文化財の持出し禁止"}],
+    suggestedScenes:["sightseeing","beach","gourmet"],
+    items:[{t:"露出控えめの服",m:"💡寺院拝観のマナーとして📝"},{t:"強力な虫除け",m:"💡蚊を介した感染症対策に📝"}],
+    memo:"寺院では肩・膝を隠す必要があります。"
+  },
+  vietnam:{
+    currency:"ドン", tip:"基本不要（端数切り上げ程度）",
+    tempByMonth:[17,18,21,25,29,32,32,31,29,26,23,19],
+    ngItems:[{t:"政治批判・反体制の書籍",m:"没収・処罰の可能性"},{t:"ドローン（無許可）",m:"🚨必ず事前許可を取得"}],
+    suggestedScenes:["sightseeing","gourmet"],
+    items:[{t:"紫外線対策グッズ",m:"💡日差しが非常に強いため📝"},{t:"マスク",m:"💡バイクの排気ガス対策に📝"}],
+    memo:"移動中の排気ガスにはマスクが有効。"
+  },
+  philippines:{
+    currency:"ペソ", tip:"20〜50ペソ程度",
+    tempByMonth:[26,27,29,31,33,31,29,28,28,28,27,25],
+    ngItems:[{t:"麻薬類",m:"🚨死刑相当の厳罰"},{t:"肉類・果物（未申告）",m:"検疫申告必須"}],
+    suggestedScenes:["beach","sightseeing"],
+    items:[{t:"除菌ジェル",m:"💡衛生面への配慮として📝"},{t:"トイレットペーパー",m:"💡備え付けがない場所が多いため📝"}],
+    memo:"紙は常に持ち歩くのが吉。"
+  },
+  singapore:{
+    currency:"シンガポールドル", tip:"不要（サービス料込）",
+    tempByMonth:[27,28,28,29,29,29,28,28,28,28,27,27],
+    ngItems:[{t:"チューインガム（持込・販売）",m:"🚨医療用を除き禁止"},{t:"電子タバコ・加熱式たばこ",m:"🚨所持・使用禁止"},{t:"麻薬類",m:"🚨死刑を含む厳罰"}],
+    suggestedScenes:["sightseeing","gourmet"],
+    items:[{t:"変換プラグ(BF型)",m:"💡コンセント形状が異なるため📝"},{t:"羽織もの",m:"💡ショッピングモール等の冷房対策📝"}],
+    memo:"ガムの持ち込みは禁止されています。"
+  },
+  malaysia:{
+    currency:"リンギット", tip:"原則不要",
+    tempByMonth:[28,28,29,30,30,29,28,28,28,28,28,28],
+    ngItems:[{t:"麻薬類",m:"🚨死刑を含む厳罰"},{t:"ポルノ系メディア",m:"持込禁止"}],
+    suggestedScenes:["sightseeing","beach"],
+    items:[{t:"変換プラグ(BF型)",m:"💡コンセント形状が異なるため📝"},{t:"大判ストール",m:"💡宗教施設での肌隠しに📝"}],
+    memo:"モスク観光にはストールが便利。"
+  },
+  indonesia:{
+    currency:"ルピア", tip:"5,000〜2万ルピア",
+    tempByMonth:[28,28,28,28,27,27,26,26,27,28,28,28],
+    ngItems:[{t:"麻薬類",m:"🚨死刑を含む厳罰"},{t:"ドローン（無許可）",m:"バリ島でも許可制"},{t:"ポルノ系メディア",m:"持込禁止"}],
+    suggestedScenes:["beach","sightseeing"],
+    items:[{t:"水に流せるウェットティッシュ",m:"💡衛生対策・トイレ用📝"},{t:"懐中電灯",m:"💡夜道の暗い場所対策に📝"}],
+    memo:"舗装されていない夜道に備えて。"
+  },
+  usa:{
+    currency:"USドル", tip:"必須（18%〜25%）",
+    tempByMonth:[23,23,24,25,26,28,29,29,29,28,26,24],
+    ngItems:[{t:"果物・野菜・植物類",m:"🚨ハワイは特に検疫が厳重"},{t:"肉類（生・加工品）",m:"申告なしは罰則あり"},{t:"1万ドル超の現金（未申告）",m:"申告義務あり"}],
+    suggestedScenes:["sightseeing","beach"],
+    items:[{t:"1ドル札を多めに",m:"💡チップ支払いをスムーズにするため📝"},{t:"クレカ2枚以上",m:"💡決済不可時や身分証代わりに📝"}],
+    memo:"チップ用現金は到着後早めに用意を。"
+  },
+  guam:{
+    currency:"USドル", tip:"必須（15%〜20%）",
+    tempByMonth:[27,27,27,28,29,29,28,28,28,28,28,27],
+    ngItems:[{t:"果物・野菜・植物類",m:"🚨アメリカ準州で検疫厳しい"},{t:"生の肉・乳製品",m:"持込禁止"}],
+    suggestedScenes:["beach"],
+    items:[{t:"1ドル札を20枚〜",m:"💡チップ用に必須📝"},{t:"マリンシューズ",m:"💡サンゴや岩場で足を保護するため📝"}],
+    memo:"海を楽しむならシューズは必須。"
+  },
+  france:{
+    currency:"ユーロ", tip:"原則不要（謝礼程度）",
+    tempByMonth:[5,6,9,13,17,20,23,23,19,15,9,6],
+    ngItems:[{t:"模造ブランド品",m:"🚨購入・所持で高額罰金"},{t:"EU域外からの肉・乳製品",m:"持込禁止"}],
+    suggestedScenes:["sightseeing","gourmet"],
+    items:[{t:"厚底スニーカー",m:"💡足に負担がかかる石畳対策📝"},{t:"丈夫なエコバッグ",m:"💡買い物時の袋が有料・弱いため📝"}],
+    memo:"歩きやすさを最優先しましょう。"
+  },
+  italy:{
+    currency:"ユーロ", tip:"原則不要（テーブル料込）",
+    tempByMonth:[8,10,13,17,22,27,30,30,26,20,14,9],
+    ngItems:[{t:"模造ブランド品",m:"🚨購入・所持で高額罰金"},{t:"観光地の石・砂（持出し）",m:"文化財保護法で禁止"}],
+    suggestedScenes:["sightseeing","gourmet"],
+    items:[{t:"セキュリティポーチ",m:"💡多発するスリから貴重品を守る📝"},{t:"ヘアオイル",m:"💡硬水による髪のパサつき防止📝"}],
+    memo:"防犯対策は日本以上にしっかりと。"
+  },
+  uk:{
+    currency:"ポンド", tip:"不要な場合が多い（12.5%加算確認）",
+    tempByMonth:[5,5,8,11,15,18,20,20,17,13,8,6],
+    ngItems:[{t:"刃物類（3インチ超）",m:"🚨公共での携帯は禁止"},{t:"EU産の特定乳製品",m:"Brexit後、制限あり"}],
+    suggestedScenes:["sightseeing"],
+    items:[{t:"変換プラグ(BF型)",m:"💡コンセント形状が異なるため📝"},{t:"折りたたみ傘",m:"💡天気が変わりやすいため📝"}],
+    memo:"1日に四季があると言われるほど不安定。"
+  },
+  spain:{
+    currency:"ユーロ", tip:"不要（少額の小銭程度）",
+    tempByMonth:[6,8,12,14,19,25,30,29,24,17,10,6],
+    ngItems:[{t:"模造ブランド品",m:"購入でも罰則の可能性"},{t:"スリに狙われやすい状況",m:"⚠️財布・スマホの露出に注意"}],
+    suggestedScenes:["sightseeing","beach","gourmet"],
+    items:[{t:"胃腸薬",m:"💡夜20時以降の遅い夕食対策📝"},{t:"強力な日焼け止め",m:"💡日差しが強烈なため📝"}],
+    memo:"食事の時間が遅いので体調管理を。"
+  },
+  portugal:{
+    currency:"ユーロ", tip:"義務ではない（5〜10%推奨）",
+    tempByMonth:[11,12,14,16,19,23,26,26,24,20,15,12],
+    ngItems:[{t:"特に厳格な持込禁止品はなし",m:"EU一般規制に準拠"}],
+    suggestedScenes:["sightseeing","gourmet"],
+    items:[{t:"滑り止め付きの靴",m:"💡タイル張りの坂道が滑るため📝"}],
+    memo:"雨が降るとタイルは非常に滑ります。"
+  },
+  germany:{
+    currency:"ユーロ", tip:"5〜10%（切り上げ）",
+    tempByMonth:[1,2,6,12,17,20,23,23,18,12,6,3],
+    ngItems:[{t:"ナチス関連シンボル・グッズ",m:"🚨所持・展示は刑事罰"},{t:"ヘイトスピーチ系メディア",m:"持込・頒布禁止"}],
+    suggestedScenes:["sightseeing","gourmet"],
+    items:[{t:"エコバッグ",m:"💡袋が完全有料なため📝"},{t:"日曜用の食料",m:"💡日曜は店が完全に閉まるため📝"}],
+    memo:"土曜のうちに買い出しを済ませて。"
+  },
+  swiss:{
+    currency:"スイス・フラン", tip:"原則不要",
+    tempByMonth:[1,2,6,11,15,19,21,21,17,11,6,2],
+    ngItems:[{t:"特に厳格な制限なし",m:"EU規制に準ずる"},{t:"花火・爆発物",m:"個人持込は原則禁止"}],
+    suggestedScenes:["outdoor","sightseeing"],
+    items:[{t:"高性能サングラス",m:"💡雪や氷の照り返し対策📝"},{t:"変換プラグ(C/J型)",m:"💡特殊な形状があるため📝"}],
+    memo:"山へ行くなら紫外線対策は厳重に。"
+  },
+  australia:{
+    currency:"豪ドル", tip:"基本不要",
+    tempByMonth:[26,26,24,22,18,16,15,16,18,21,23,25],
+    ngItems:[{t:"食品・果物・野菜",m:"🚨世界最厳レベルの生物検疫"},{t:"木製品・竹製品",m:"要申告、持込禁止の場合も"},{t:"土付き靴・アウトドア用品",m:"🚨要申告・事前洗浄が必要"}],
+    suggestedScenes:["outdoor","beach","sightseeing"],
+    items:[{t:"高性能サングラス",m:"💡非常に強い紫外線から目を守る📝"},{t:"タンブラー",m:"💡街中の給水スポット利用に📝"},{t:"変換プラグ(O型)",m:"💡ハの字型の形状なため📝"}],
+    memo:"日焼け止めも現地調達がおすすめなほど強いです。"
+  },
+  nz:{
+    currency:"NZドル", tip:"基本不要",
+    tempByMonth:[23,23,22,19,16,14,13,13,15,17,19,22],
+    ngItems:[{t:"食品・果物・肉類（未申告）",m:"🚨高額罰金（最大400NZD）"},{t:"土付き靴・登山用品",m:"🚨靴底の汚れも厳格チェック"},{t:"ハチミツ・蜂関連製品",m:"持込禁止"}],
+    suggestedScenes:["outdoor","sightseeing"],
+    items:[{t:"調節しやすい防寒着",m:"💡天候変化が激しく冷え込むため📝"},{t:"日焼け止め",m:"💡オゾン層の関係で紫外線が強いため📝"}],
+    memo:"靴底の泥汚れ等の持ち込み制限に注意。"
+  },
+  other:{
+    currency:"現地通貨", tip:"要確認",
+    tempByMonth:null,
+    ngItems:[{t:"各国の規制を事前確認",m:"外務省・在外公館HPで確認推奨"}],
+    suggestedScenes:[],
+    items:[{t:"変換プラグ",m:"💡渡航先の形状を確認📝"},{t:"モバイルバッテリー",m:"💡慣れない土地での電池切れ対策📝"}],
+    memo:"事前に現地のマナーを調べましょう。"
+  }
+};
 
-    let currentGender = localStorage.getItem('gender_v16') || 'female';
-    let checkedItems = JSON.parse(localStorage.getItem('checked_v16') || '[]');
-    let deletedSubs = JSON.parse(localStorage.getItem('deleted_subs_v16') || '[]');
+// ─── Scene items ──────────────────────────────────────────────────────────
+const sceneItems = {
+  sightseeing:{
+    label:"🗼 観光メイン向けアイテム",
+    items:[{name:"観光グッズ📍",subs:[{t:"ガイドブック・地図"},{t:"折りたたみ傘☂️",m:"💡急な天気変化に対応"},{t:"歩きやすいスニーカー"},{t:"翻訳アプリ（オフライン）"}]}]
+  },
+  beach:{
+    label:"🏖️ ビーチ・リゾート向けアイテム",
+    items:[{name:"ビーチセット🌊",subs:[{t:"水着👙"},{t:"日焼け止め（SPF50+）"},{t:"マリンシューズ",m:"💡サンゴ・岩場対策"},{t:"防水ポーチ"},{t:"ラッシュガード"}]}]
+  },
+  business:{
+    label:"💼 ビジネス出張向けアイテム",
+    items:[{name:"ビジネスセット👔",subs:[{t:"スーツ・ジャケット"},{t:"名刺💼"},{t:"ノートPC・充電器🖥️"},{t:"ドレスシューズ"},{t:"ポータブルアイロン"}]}]
+  },
+  outdoor:{
+    label:"🏔️ アウトドア・登山向けアイテム",
+    items:[{name:"アウトドアセット🏕️",subs:[{t:"登山靴・トレッキングシューズ"},{t:"レインウェア☔"},{t:"防寒着・フリース🧥"},{t:"ヘッドランプ🔦"},{t:"行動食・エネルギーバー"},{t:"ファーストエイドキット🩹"}]}]
+  },
+  gourmet:{
+    label:"🍽️ グルメ旅向けアイテム",
+    items:[{name:"グルメセット🍴",subs:[{t:"胃腸薬・消化薬💊"},{t:"食べ歩き用エコバッグ"},{t:"料理撮影用スタンド📸",m:"💡映える料理写真に"},{t:"食リポノート📓"}]}]
+  }
+};
 
-    function saveConfig() {
-        localStorage.setItem('area_v16', document.getElementById('area').value);
-        localStorage.setItem('nights_v16', document.getElementById('nights').value);
-        localStorage.setItem('tripStyle_v16', document.getElementById('tripStyle').value);
-    }
+// ─── Packing master ───────────────────────────────────────────────────────
+const packingMaster = [
+  {category:"💳 貴重品・ガジェット",items:[
+    {name:"基本セット👛",subs:[{t:"財布・現金"},{t:"身分証🪪"},{t:"クレカ💳"}]},
+    {name:"ガジェット🔋",subs:[{t:"スマホ📱"},{t:"充電器🔌"},{t:"モバイルバッテリー🔋"}]},
+    {name:"海外必需品✈️",isOverseas:true,subs:[{t:"パスポート📕"},{t:"航空券控え🎫"}]}
+  ]},
+  {category:"🧴 美容・ケア",items:[
+    {name:"スキンケア✨",gender:"female",subs:[{t:"クレンジング"},{t:"洗顔"},{t:"化粧水・乳液"},{t:"フェイスパック"}]},
+    {name:"スキンケア✨",gender:"male",subs:[{t:"スクラブ洗顔"},{t:"オールインワン"},{t:"日焼け止め"}]},
+    {name:"メイク/身だしなみ",gender:"female",subs:[{t:"コスメ一式🎨"},{t:"ヘアアイロン"}]},
+    {name:"身だしなみ🪒",gender:"male",subs:[{t:"髭剃り🪒"},{t:"ワックス"}]}
+  ]},
+  {category:"👗 衣類・日用品",items:[
+    {name:"お洋服👕",hasQty:true,subs:[{t:"着替え（上下）"},{t:"下着👙"},{t:"靴下🧦"}]},
+    {name:"衛生用品🩹",subs:[{t:"常備薬💊"},{t:"ウェットティッシュ"},{t:"ハンカチ🧼"}]}
+  ]}
+];
 
-    function setGender(gender) {
-        currentGender = gender;
-        localStorage.setItem('gender_v16', gender);
-        document.getElementById('body').className = 'mode-' + gender;
-        document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-' + gender).classList.add('active');
-        initList();
-    }
+// ─── State ────────────────────────────────────────────────────────────────
+let currentGender   = localStorage.getItem(`gender_${SV}`)   || 'female';
+let checkedItems    = JSON.parse(localStorage.getItem(`checked_${SV}`)   || '[]');
+let deletedSubs     = JSON.parse(localStorage.getItem(`delSubs_${SV}`)   || '[]');
+let flaggedItems    = JSON.parse(localStorage.getItem(`flagged_${SV}`)   || '[]');
+let customItems     = JSON.parse(localStorage.getItem(`custom_${SV}`)    || '[]');
+let collapsedCats   = JSON.parse(localStorage.getItem(`collapsed_${SV}`) || '[]');
+let selectedScenes  = JSON.parse(localStorage.getItem(`scenes_${SV}`)    || '[]');
 
-    function toggleOverseas() {
-        document.getElementById('style-div').style.display = document.getElementById('area').value === 'overseas' ? 'block' : 'none';
-    }
+// ─── Helpers ──────────────────────────────────────────────────────────────
+function saveAll() {
+  localStorage.setItem(`checked_${SV}`,   JSON.stringify(checkedItems));
+  localStorage.setItem(`delSubs_${SV}`,   JSON.stringify(deletedSubs));
+  localStorage.setItem(`flagged_${SV}`,   JSON.stringify(flaggedItems));
+  localStorage.setItem(`custom_${SV}`,    JSON.stringify(customItems));
+  localStorage.setItem(`collapsed_${SV}`, JSON.stringify(collapsedCats));
+  localStorage.setItem(`scenes_${SV}`,    JSON.stringify(selectedScenes));
+}
+function saveConfig() {
+  localStorage.setItem(`area_${SV}`,   document.getElementById('area').value);
+  localStorage.setItem(`nights_${SV}`, document.getElementById('nights').value);
+  localStorage.setItem(`style_${SV}`,  document.getElementById('tripStyle').value);
+  localStorage.setItem(`month_${SV}`,  document.getElementById('travelMonth').value);
+  localStorage.setItem(`depart_${SV}`, document.getElementById('departDate').value);
+}
 
-    function initList() {
-        const todoContainer = document.getElementById('todo-list');
-        const doneContainer = document.getElementById('done-list');
-        const doneSection = document.getElementById('done-section');
-        const infoBox = document.getElementById('country-info');
-        const style = document.getElementById('tripStyle').value;
-        const area = document.getElementById('area').value;
-        const nights = parseInt(document.getElementById('nights').value) || 0;
-        
-        todoContainer.innerHTML = '';
-        doneContainer.innerHTML = '';
+function getTempInfo(temp) {
+  if (temp <= 5)  return {cls:'temp-cold', label:`${temp}°C ❄️ 極寒`, advice:'厚手コート・手袋・マフラー必須。重ね着推奨。'};
+  if (temp <= 12) return {cls:'temp-cold', label:`${temp}°C 🧥 寒い`, advice:'薄手ダウンや重ね着が有効。防寒を意識して。'};
+  if (temp <= 20) return {cls:'temp-cool', label:`${temp}°C 🌤️ 快適`, advice:'過ごしやすい気候。薄手の羽織ものを一枚。'};
+  if (temp <= 27) return {cls:'temp-mild', label:`${temp}°C ☀️ 暖かい`, advice:'半袖がちょうどいい。日焼け止めも持参を。'};
+  return          {cls:'temp-hot',  label:`${temp}°C 🔥 酷暑！`, advice:'熱中症・脱水に注意。経口補水液や冷却グッズを。'};
+}
 
-        // 国別情報の更新
-        if (area === 'overseas' && countryData[style]) {
-            const d = countryData[style];
-            infoBox.style.display = 'block';
-            infoBox.innerHTML = `<h3>📍 ${document.getElementById('tripStyle').selectedOptions[0].text} 情報</h3>
-                <p>💰 <b>通貨:</b> ${d.currency} | 🛎️ <b>チップ:</b> ${d.tip}</p>
-                <p>💡 <b>アドバイス:</b> ${d.memo}</p>
-                <a href="https://www.google.com/search?q=${encodeURIComponent(d.currency)}+レート+本日" target="_blank" class="rate-link">📊 最新レートを確認する</a>`;
-        } else { infoBox.style.display = 'none'; }
+// ─── UI updates ───────────────────────────────────────────────────────────
+function setGender(g) {
+  currentGender = g;
+  localStorage.setItem(`gender_${SV}`, g);
+  document.getElementById('body').className = 'mode-' + g;
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + g).classList.add('active');
+  initList();
+}
 
-        // リスト組み立て
-        let fullMaster = [...packingMaster];
-        if (area === 'overseas' && countryData[style]) {
-            fullMaster = [{ category: "🚩 渡航先別おすすめアイテム", items: [{ name: "現地対策セット", subs: countryData[style].items }] }, ...packingMaster];
-        }
+function toggleOverseas() {
+  const isOverseas = document.getElementById('area').value === 'overseas';
+  document.getElementById('style-div').style.display   = isOverseas ? 'block' : 'none';
+  document.getElementById('scene-section').style.display = isOverseas ? 'block' : 'none';
+}
 
-        fullMaster.forEach(cat => {
-            if (cat.isOverseas && area === 'domestic') return;
-            let tempTodoHtml = '';
-            let tempDoneHtml = '';
-            
-            cat.items.forEach(item => {
-                if (item.gender && item.gender !== currentGender) return;
-                
-                const isChecked = checkedItems.includes(item.name);
-                let subsHtml = '';
-                item.subs.forEach(sub => {
-                    const subId = `${item.name}_${sub.t}`;
-                    if (deletedSubs.includes(subId)) return;
-                    const isSubChecked = localStorage.getItem('sub_' + subId) === 'true';
-                    subsHtml += `<div class="sub-item ${isSubChecked ? 'sub-checked' : ''}">
-                        <div class="sub-content" onclick="toggleSub('${subId}')">
-                            <div class="sub-check"></div>
-                            <div><span>${sub.t}</span>${sub.m ? `<span class="memo">${sub.m}</span>` : ''}</div>
-                        </div>
-                        <button class="btn-del-sub" onclick="deleteSub(event,'${subId}')">🗑️</button>
-                    </div>`;
-                });
-                
-                const qtyText = item.hasQty ? ` <small>[${nights+1}点]</small>` : "";
-                const itemHtml = `<div class="item-row ${isChecked ? 'checked' : ''}">
-                    <div class="item-main" onclick="toggleParent('${item.name}')">
-                        <div class="check-box"></div>
-                        <span class="item-label">${item.name}${qtyText}</span>
-                    </div>
-                    ${subsHtml ? `<div class="sub-container">${subsHtml}</div>` : ''}
-                </div>`;
+function updateCountryInfo() {
+  const style = document.getElementById('tripStyle').value;
+  const month = parseInt(document.getElementById('travelMonth').value) || 0;
+  const infoBox = document.getElementById('country-info');
+  const area = document.getElementById('area').value;
 
-                if (isChecked) tempDoneHtml += itemHtml;
-                else tempTodoHtml += itemHtml;
-            });
+  if (area !== 'overseas' || !countryData[style]) {
+    infoBox.style.display = 'none'; return;
+  }
+  const d = countryData[style];
+  const countryName = document.getElementById('tripStyle').selectedOptions[0].text;
 
-            if (tempTodoHtml) {
-                todoContainer.innerHTML += `<div class="cat-title">${cat.category}</div>` + tempTodoHtml;
-            }
-            if (tempDoneHtml) {
-                doneContainer.innerHTML += tempDoneHtml;
-            }
-        });
+  // Temperature
+  let tempHtml = '';
+  if (d.tempByMonth && month) {
+    const t = getTempInfo(d.tempByMonth[month - 1]);
+    tempHtml = `<p>🌡️ <b>${month}月の平均気温：</b><span class="temp-badge ${t.cls}">${t.label}</span></p>
+                <p style="color:#777;font-size:.72rem;margin-left:6px;">👉 ${t.advice}</p>`;
+  } else if (d.tempByMonth) {
+    tempHtml = `<p style="color:#bbb;font-size:.72rem;">💡 出発月を選択すると気温情報が表示されます。</p>`;
+  }
 
-        // 完了セクションの表示・非表示
-        doneSection.style.display = doneContainer.innerHTML ? 'block' : 'none';
-    }
+  // NG items
+  const ngHtml = `<div class="ng-section">
+    <div class="ng-title">⛔ 持込NG・要注意アイテム</div>
+    ${d.ngItems.map(n=>`<div class="ng-item">・${n.t}<span style="color:#aaa;"> — ${n.m}</span></div>`).join('')}
+  </div>`;
 
-    function toggleParent(name) {
-        if (checkedItems.includes(name)) checkedItems = checkedItems.filter(i => i !== name);
-        else checkedItems.push(name);
-        save(); initList();
-    }
+  infoBox.style.display = 'block';
+  infoBox.innerHTML = `
+    <h3>📍 ${countryName} 情報</h3>
+    <p>💰 <b>通貨：</b>${d.currency} | 🛎️ <b>チップ：</b>${d.tip}</p>
+    ${tempHtml}
+    <p>💡 <b>アドバイス：</b>${d.memo}</p>
+    ${ngHtml}
+    <a href="https://www.google.com/search?q=${encodeURIComponent(d.currency)}+レート+本日" target="_blank" class="rate-link">📊 最新レートを確認する</a>`;
+}
 
-    function toggleSub(id) {
-        const key = 'sub_' + id;
-        localStorage.setItem(key, localStorage.getItem(key) !== 'true');
-        initList();
-    }
+function updateSuggestedScenes() {
+  const style = document.getElementById('tripStyle').value;
+  const suggested = countryData[style]?.suggestedScenes || [];
+  document.querySelectorAll('.scene-chip').forEach(btn => {
+    const s = btn.dataset.scene;
+    btn.classList.toggle('suggested', !btn.classList.contains('active') && suggested.includes(s));
+  });
+}
 
-    function deleteSub(e, id) {
-        e.stopPropagation();
-        if (confirm('項目を削除しますか？')) { deletedSubs.push(id); save(); initList(); }
-    }
+function updateCountdown() {
+  const val = document.getElementById('departDate').value;
+  const el = document.getElementById('countdown-text');
+  if (!val) { el.textContent = ''; return; }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const depart = new Date(val);
+  const diff = Math.round((depart - today) / 86400000);
+  if (diff < 0)       el.textContent = '';
+  else if (diff === 0) el.textContent = '✈️ 今日出発！';
+  else if (diff === 1) el.textContent = '✈️ 明日出発！';
+  else                 el.textContent = `✈️ 出発まであと ${diff} 日`;
+}
 
-    function resetAll() {
-        if (confirm('リセットしますか？')) {
-            localStorage.clear();
-            checkedItems = []; deletedSubs = [];
-            document.getElementById('area').value = 'domestic';
-            document.getElementById('nights').value = '1';
-            document.getElementById('tripStyle').value = 'none';
-            setGender(currentGender);
-        }
-    }
+function updateProgress() {
+  const total = document.querySelectorAll('#todo-list .item-row:not(.custom-placeholder), #done-list .item-row').length +
+                document.querySelectorAll('#todo-list .item-row').length;
+  const done  = document.querySelectorAll('#done-list .item-row').length;
+  const all   = done + document.querySelectorAll('#todo-list .item-row').length;
+  const pct   = all > 0 ? Math.round(done / all * 100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${done}/${all} ✓`;
+}
 
-    function save() {
-        localStorage.setItem('checked_v16', JSON.stringify(checkedItems));
-        localStorage.setItem('deleted_subs_v16', JSON.stringify(deletedSubs));
-    }
+function toggleScene(scene) {
+  const idx = selectedScenes.indexOf(scene);
+  if (idx >= 0) selectedScenes.splice(idx, 1);
+  else selectedScenes.push(scene);
+  saveAll();
+  document.querySelectorAll('.scene-chip').forEach(btn => {
+    const s = btn.dataset.scene;
+    btn.classList.toggle('active', selectedScenes.includes(s));
+    if (selectedScenes.includes(s)) btn.classList.remove('suggested');
+  });
+  updateSuggestedScenes();
+  initList();
+}
 
-    window.addEventListener('DOMContentLoaded', () => {
-        if(localStorage.getItem('area_v16')) document.getElementById('area').value = localStorage.getItem('area_v16');
-        if(localStorage.getItem('nights_v16')) document.getElementById('nights').value = localStorage.getItem('nights_v16');
-        if(localStorage.getItem('tripStyle_v16')) document.getElementById('tripStyle').value = localStorage.getItem('tripStyle_v16');
-        toggleOverseas();
-        setGender(currentGender);
+function toggleCat(id) {
+  const idx = collapsedCats.indexOf(id);
+  if (idx >= 0) collapsedCats.splice(idx, 1);
+  else collapsedCats.push(id);
+  saveAll();
+  const title = document.querySelector(`.cat-title[data-cat="${CSS.escape(id)}"]`);
+  const body  = title?.nextElementSibling;
+  if (title && body) {
+    title.classList.toggle('collapsed', collapsedCats.includes(id));
+    body.classList.toggle('hidden', collapsedCats.includes(id));
+  }
+}
+
+// ─── List rendering ───────────────────────────────────────────────────────
+function renderItem(item, nights, source) {
+  const isChecked = checkedItems.includes(item.name);
+  const isFlagged = flaggedItems.includes(item.name);
+  const isCustom  = source === 'custom';
+
+  let subsHtml = '';
+  if (item.subs) {
+    item.subs.forEach(sub => {
+      const subId = `${item.name}_${sub.t}`;
+      if (deletedSubs.includes(subId)) return;
+      const isSubChecked = localStorage.getItem('sub_' + subId) === 'true';
+      subsHtml += `<div class="sub-item ${isSubChecked ? 'sub-checked' : ''}">
+        <div class="sub-content" onclick="toggleSub('${subId.replace(/'/g,"\\'")}')">
+          <div class="sub-check"></div>
+          <div><span>${sub.t}</span>${sub.m ? `<span class="memo">${sub.m}</span>` : ''}</div>
+        </div>
+        ${!isCustom ? `<button class="btn-del-sub" onclick="deleteSub(event,'${subId.replace(/'/g,"\\'")}')">🗑️</button>` : ''}
+      </div>`;
     });
+  }
+
+  const qtyText = item.hasQty ? ` <small>[${nights+1}点]</small>` : '';
+  const safeN = item.name.replace(/'/g, "\\'");
+  return `<div class="item-row ${isChecked?'checked':''} ${isFlagged?'flagged':''}">
+    <div class="item-header">
+      <div class="item-main" onclick="toggleParent('${safeN}')">
+        <div class="check-box"></div>
+        <span class="item-label">${item.name}${qtyText}</span>
+      </div>
+      <div style="display:flex;gap:2px;">
+        <button class="btn-flag" onclick="toggleFlag(event,'${safeN}')" title="あとで確認">🔖</button>
+        ${isCustom ? `<button class="btn-del-custom" onclick="deleteCustomItem(event,'${safeN}')">✕</button>` : ''}
+      </div>
+    </div>
+    ${subsHtml ? `<div class="sub-container">${subsHtml}</div>` : ''}
+  </div>`;
+}
+
+function renderCategory(cat, items, nights, source) {
+  const collapsed = collapsedCats.includes(cat);
+  const safeCat = cat.replace(/"/g, '&quot;');
+  const itemsHtml = items.map(i => renderItem(i, nights, source)).join('');
+  return `<div class="cat-title ${collapsed?'collapsed':''}" data-cat="${safeCat}" onclick="toggleCat('${safeCat.replace(/'/g,"\\'")}')">
+    <span>${cat}</span><span class="cat-toggle">▼</span>
+  </div>
+  <div class="cat-body ${collapsed?'hidden':''}">${itemsHtml}</div>`;
+}
+
+function initList() {
+  const todoEl   = document.getElementById('todo-list');
+  const doneEl   = document.getElementById('done-list');
+  const doneSec  = document.getElementById('done-section');
+  const nights   = parseInt(document.getElementById('nights').value) || 0;
+  const style    = document.getElementById('tripStyle').value;
+  const area     = document.getElementById('area').value;
+
+  todoEl.innerHTML = '';
+  doneEl.innerHTML = '';
+
+  // Build full master
+  let fullMaster = [...packingMaster];
+  if (area === 'overseas' && countryData[style]) {
+    fullMaster = [{
+      category:"🚩 渡航先別おすすめアイテム",
+      items:[{name:"現地対策セット",subs:countryData[style].items}]
+    }, ...fullMaster];
+  }
+
+  // Add scene categories
+  if (area === 'overseas' && selectedScenes.length > 0) {
+    selectedScenes.forEach(sc => {
+      if (sceneItems[sc]) {
+        fullMaster = [{
+          category: sceneItems[sc].label,
+          items: sceneItems[sc].items,
+          isScene: true
+        }, ...fullMaster];
+      }
+    });
+  }
+
+  // Custom items category
+  if (customItems.length > 0) {
+    fullMaster = [...fullMaster, {
+      category:"✏️ カスタムアイテム",
+      items: customItems.map(c => ({
+        name: c.name,
+        subs: c.memo ? [{t:c.memo}] : []
+      })),
+      isCustom: true
+    }];
+  }
+
+  fullMaster.forEach(cat => {
+    if (cat.isOverseas && area === 'domestic') return;
+    let todoItems = [], doneItems = [];
+    cat.items.forEach(item => {
+      if (item.gender && item.gender !== currentGender) return;
+      if (checkedItems.includes(item.name)) doneItems.push(item);
+      else todoItems.push(item);
+    });
+    if (todoItems.length > 0) {
+      todoEl.innerHTML += renderCategory(cat.category, todoItems, nights, cat.isCustom ? 'custom' : 'master');
+    }
+    if (doneItems.length > 0) {
+      doneEl.innerHTML += doneItems.map(i => renderItem(i, nights, cat.isCustom ? 'custom' : 'master')).join('');
+    }
+  });
+
+  doneSec.style.display = doneEl.innerHTML ? 'block' : 'none';
+  updateProgress();
+}
+
+// ─── Item actions ─────────────────────────────────────────────────────────
+function toggleParent(name) {
+  if (checkedItems.includes(name)) checkedItems = checkedItems.filter(i => i !== name);
+  else checkedItems.push(name);
+  saveAll(); initList();
+}
+function toggleSub(id) {
+  const key = 'sub_' + id;
+  localStorage.setItem(key, localStorage.getItem(key) !== 'true');
+  initList();
+}
+function deleteSub(e, id) {
+  e.stopPropagation();
+  if (confirm('この項目を削除しますか？')) { deletedSubs.push(id); saveAll(); initList(); }
+}
+function toggleFlag(e, name) {
+  e.stopPropagation();
+  const idx = flaggedItems.indexOf(name);
+  if (idx >= 0) flaggedItems.splice(idx, 1);
+  else flaggedItems.push(name);
+  saveAll(); initList();
+}
+
+// ─── Custom items ─────────────────────────────────────────────────────────
+function showAddForm() {
+  document.getElementById('add-form').classList.add('visible');
+  document.getElementById('btn-add-open').style.display = 'none';
+  document.getElementById('custom-name').focus();
+}
+function hideAddForm() {
+  document.getElementById('add-form').classList.remove('visible');
+  document.getElementById('btn-add-open').style.display = 'block';
+  document.getElementById('custom-name').value = '';
+  document.getElementById('custom-memo').value = '';
+}
+function addCustomItem() {
+  const name = document.getElementById('custom-name').value.trim();
+  if (!name) { alert('アイテム名を入力してください。'); return; }
+  if (customItems.some(c => c.name === name)) { alert('同じ名前のアイテムが既にあります。'); return; }
+  const memo = document.getElementById('custom-memo').value.trim();
+  customItems.push({name, memo});
+  saveAll(); hideAddForm(); initList();
+}
+function deleteCustomItem(e, name) {
+  e.stopPropagation();
+  if (confirm(`「${name}」を削除しますか？`)) {
+    customItems = customItems.filter(c => c.name !== name);
+    checkedItems = checkedItems.filter(i => i !== name);
+    flaggedItems = flaggedItems.filter(i => i !== name);
+    saveAll(); initList();
+  }
+}
+
+// ─── Reset ────────────────────────────────────────────────────────────────
+function resetAll() {
+  if (confirm('リセットしますか？チェック・フラグ・カスタムアイテムがすべて消えます。')) {
+    checkedItems = []; deletedSubs = []; flaggedItems = [];
+    customItems  = []; collapsedCats= []; selectedScenes = [];
+    localStorage.clear();
+    document.getElementById('area').value       = 'domestic';
+    document.getElementById('nights').value     = '1';
+    document.getElementById('tripStyle').value  = 'none';
+    document.getElementById('travelMonth').value= '';
+    document.getElementById('departDate').value = '';
+    document.querySelectorAll('.scene-chip').forEach(b => b.classList.remove('active','suggested'));
+    toggleOverseas();
+    updateCountdown();
+    setGender(currentGender);
+  }
+}
+
+// ─── Export ───────────────────────────────────────────────────────────────
+function exportPDF() {
+  const noPrint = document.querySelectorAll('.no-print');
+  noPrint.forEach(el => el.style.visibility = 'hidden');
+  const el = document.getElementById('main-content');
+  html2pdf().from(el).set({
+    margin: 10,
+    filename: 'packing-list.pdf',
+    image: {type:'jpeg', quality:.97},
+    html2canvas: {scale:2, useCORS:true},
+    jsPDF: {unit:'mm', format:'a4', orientation:'portrait'}
+  }).save().then(() => {
+    noPrint.forEach(el => el.style.visibility = '');
+  });
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const get = k => localStorage.getItem(`${k}_${SV}`);
+  if (get('area'))   document.getElementById('area').value       = get('area');
+  if (get('nights')) document.getElementById('nights').value     = get('nights');
+  if (get('style'))  document.getElementById('tripStyle').value  = get('style');
+  if (get('month'))  document.getElementById('travelMonth').value= get('month');
+  if (get('depart')) document.getElementById('departDate').value = get('depart');
+
+  selectedScenes.forEach(s => {
+    document.querySelector(`.scene-chip[data-scene="${s}"]`)?.classList.add('active');
+  });
+
+  toggleOverseas();
+  updateCountryInfo();
+  updateCountdown();
+  updateSuggestedScenes();
+  setGender(currentGender);
+});
 </script>
 </body>
 </html>
